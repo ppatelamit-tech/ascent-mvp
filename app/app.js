@@ -31,7 +31,7 @@
   }
   function topline(pct, where, onBack) { return h("div", { class: "topline" }, h("button", { class: "back", "aria-label": "Back", onclick: onBack || (() => history.back()) }, "←"), h("div", { class: "bar" }, h("div", { style: { width: pct + "%" } })), h("div", { class: "where" }, where)); }
   function screen(cls, ...kids) { return h("section", { class: "screen " + (cls || "") }, ...kids); }
-  function nav(hash) { location.hash = hash; }
+  function nav(hash) { const target = "#" + hash; if (location.hash === target) render(); else location.hash = hash; }
   function fmtDate(ts) { return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric" }); }
   function slider(prompt, low, high, init, onChange) {
     let v = init; const out = h("div", { class: "val" }, String(v));
@@ -154,58 +154,105 @@
 
   // ---------- capability ----------
   function weekOf(start, weeks) { if (!start) return 0; return Math.min(weeks, Math.floor((Date.now() - start) / (7 * 864e5)) + 1); }
+  function capState() { const c = st.capability; c.priorities = c.priorities || []; c.completions = c.completions || []; c.readiness = c.readiness || []; c.daily = c.daily || {}; if (!c.playerId) c.playerId = Array.from(crypto.getRandomValues(new Uint8Array(12)), b => (b % 36).toString(36)).join(""); return c; }
+  function capPoints(c) { return c.completions.reduce((a, k) => a + (CAP.points[k.tier] || 0), 0); }
+  function capLevel(p) { return CAP.levels.reduce((l, t, i) => (p >= t ? i + 1 : l), 1); }
+  function nextLevelAt(p) { const t = CAP.levels.find(t => t > p); return t == null ? null : t; }
+  function dayKey(ts) { const d = new Date(ts || Date.now()); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
+  function seeded(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 100000) / 100000; }; }
+  function todaysThree() {
+    const c = capState(); const key = dayKey();
+    if (c.daily[key] && c.daily[key].length === 3 && c.daily[key].every(id => CAP.deck.some(x => x.id === id))) return c.daily[key].map(id => CAP.deck.find(x => x.id === id));
+    const rnd = seeded(c.playerId + key); const done = new Set(c.completions.map(k => k.id)); const pri = c.priorities.length ? c.priorities : CAP.categories;
+    const pick = tier => { let pool = CAP.deck.filter(x => x.tier === tier && pri.includes(x.cat) && !done.has(x.id)); if (!pool.length) pool = CAP.deck.filter(x => x.tier === tier && pri.includes(x.cat)); if (!pool.length) pool = CAP.deck.filter(x => x.tier === tier); return pool[Math.floor(rnd() * pool.length)]; };
+    const three = CAP.tiers.map(t => pick(t.id)); c.daily = { [key]: three.map(x => x.id) }; save(); return three;
+  }
+  async function syncLeaderboard() { const c = capState(); if (!c.playerName) return; try { await fetch("/api/leaderboard", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: c.playerId, name: c.playerName, ledger: c.completions.map(k => ({ at: k.at, tier: k.tier })) }) }); } catch {} }
+  function prioritiesScreen(firstTime) {
+    const c = capState(); let sel = new Set(c.priorities);
+    const el = screen("", topline(0, "Priorities", () => nav("/capability")));
+    el.append(h("p", { class: "eyebrow" }, "Capability · over fear"), h("h1", {}, em(CAP.prioritiesIntro.title)), h("p", { class: "help" }, CAP.prioritiesIntro.body));
+    const opts = h("div", { class: "options" }); const btn = h("button", { class: "btn btn-primary", onclick: () => { c.priorities = CAP.categories.filter(x => sel.has(x)); if (firstTime) c.blockStart = c.blockStart || Date.now(); c.daily = {}; save(); nav("/capability"); } }, firstTime ? "Show me today's three" : "Save");
+    const upd = () => { btn.disabled = sel.size < CAP.daily.minPriorities; [...opts.children].forEach(o => o.setAttribute("aria-checked", String(sel.has(o.dataset.c)))); };
+    CAP.categories.forEach(cat => opts.append(h("button", { class: "opt", role: "checkbox", "data-c": cat, onclick: () => { sel.has(cat) ? sel.delete(cat) : sel.add(cat); upd(); } }, h("span", { class: "dot", style: { borderRadius: "6px" } }), h("span", {}, h("strong", {}, cat), h("span", { style: { display: "block", fontSize: "0.85rem", color: "var(--t-faint)" } }, CAP.categoryNotes[cat])))));
+    el.append(opts, h("div", { class: "spacer" }), h("div", { class: "actions" }, btn)); upd(); return el;
+  }
+  route(/^capability\/priorities$/, () => prioritiesScreen(false));
   route(/^capability$/, () => {
-    const d = byId.capability, c = st.capability;
+    const d = byId.capability, c = capState();
+    if (!c.blockStart || c.priorities.length < CAP.daily.minPriorities) return prioritiesScreen(true);
     const el = screen("", topline(0, "Capability", () => nav("/")));
     el.append(h("div", { class: "hub-head" }, mark(d, true), h("div", {}, h("p", { class: "eyebrow", style: { marginTop: 0 } }, "Capability · over fear"), h("h1", { style: { marginTop: "4px" } }, d.line))));
-    el.append(h("p", { class: "help" }, "Confidence is a record of things done under fear, not a feeling to be summoned. Pick a challenge, rate your body before, do it, rate after, write one line. The lines become your evidence file."));
-    if (!c.blockStart) {
-      el.append(h("div", { class: "callout" }, h("h3", {}, "The block"), `Six weeks. Three challenges a week, your choice of tier. One lesson a week (lessons arrive in the full app). Start when you are ready to do the first one today.`), h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => { c.blockStart = Date.now(); save(); render(); } }, "Start the block")));
-      return el;
-    }
-    const wk = weekOf(c.blockStart, CAP.block.weeks), done = c.completions.length;
-    const thisWeek = c.completions.filter(x => x.at > c.blockStart + (wk - 1) * 7 * 864e5).length;
-    const deltas = c.completions.filter(x => typeof x.before === "number" && typeof x.after === "number").map(x => x.before - x.after);
-    const avgDrop = deltas.length ? (deltas.reduce((a, b) => a + b, 0) / deltas.length).toFixed(1) : "–";
-    el.append(h("div", { class: "weeks" }, ...Array.from({ length: CAP.block.weeks }, (_, i) => h("span", { class: i + 1 < wk ? "done" : i + 1 === wk ? "now" : "" }))), h("p", { class: "help", style: { fontSize: "0.82rem" } }, `Week ${wk} of ${CAP.block.weeks} · ${thisWeek} of ${CAP.block.perWeek} this week`));
-    el.append(h("div", { class: "stat-row" }, h("div", { class: "stat" }, h("div", { class: "n" }, done), h("div", { class: "l" }, "in the evidence file")), h("div", { class: "stat" }, h("div", { class: "n" }, avgDrop), h("div", { class: "l" }, "avg arousal drop, before → after")), h("div", { class: "stat" }, h("div", { class: "n" }, c.completions.filter(x => x.tier === "edge").length), h("div", { class: "l" }, "edge challenges"))));
-    el.append(h("h2", {}, CAP.block.lesson_titles[wk - 1] || CAP.block.lesson_titles[0]), h("p", { class: "help", style: { fontSize: "0.88rem" } }, "This week's lesson. Video arrives in the full app."));
-    el.append(h("div", { class: "spacer" }), h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: "#/capability/deck" }, "Pick a challenge"), h("a", { class: "btn", href: "#/capability/evidence" }, `Evidence file (${done})`), h("a", { class: "btn btn-link", href: "#/capability/readiness" }, "Two taps: readiness and load")));
+    const pts = capPoints(c), lvl = capLevel(pts), next = nextLevelAt(pts), prev = CAP.levels[lvl - 1];
+    const pct = next ? Math.round(((pts - prev) / (next - prev)) * 100) : 100;
+    el.append(h("div", { class: "stat-row" }, h("div", { class: "stat" }, h("div", { class: "n" }, `L${lvl}`), h("div", { class: "l" }, next ? `${next - pts} to level ${lvl + 1}` : "top level")), h("div", { class: "stat" }, h("div", { class: "n" }, pts), h("div", { class: "l" }, "points")), h("div", { class: "stat" }, h("div", { class: "n" }, c.completions.length), h("div", { class: "l" }, "in the evidence file"))));
+    el.append(h("div", { class: "track", style: { height: "8px", background: "var(--hairline)", borderRadius: "4px", overflow: "hidden", marginTop: "10px" } }, h("div", { style: { width: pct + "%", height: "100%", background: d.color, borderRadius: "4px" } })));
+    const three = todaysThree(); const today = dayKey(); const doneToday = new Set(c.completions.filter(k => dayKey(k.at) === today).map(k => k.id));
+    el.append(h("h2", {}, "Today's three"), h("p", { class: "help", style: { fontSize: "0.88rem", marginTop: "4px" } }, `From ${c.priorities.join(", ").toLowerCase()}. New three tomorrow. `, h("a", { href: "#/capability/priorities" }, "Change areas")));
+    const list = h("ul", { class: "deck" });
+    three.forEach(x => { const tier = CAP.tiers.find(t => t.id === x.tier); const done = doneToday.has(x.id); list.append(h("li", {}, h("button", { class: "card" + (done ? " done" : ""), onclick: () => { if (!done) nav("/capability/do/" + x.id); } }, h("span", { class: "cat" }, h("strong", { style: { color: "var(--t-strong)" } }, tier.name), h("br"), `${CAP.points[x.tier]} pts`, h("br"), x.cat), h("span", {}, x.t, done ? " ✓" : "")))); });
+    el.append(list);
+    const wk = weekOf(c.blockStart, CAP.block.weeks);
+    el.append(h("h2", {}, CAP.block.lesson_titles[wk - 1] || CAP.block.lesson_titles[0]), h("p", { class: "help", style: { fontSize: "0.88rem" } }, `Week ${wk} lesson. Video arrives in the full app.`));
+    el.append(h("div", { class: "spacer" }), h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: "#/capability/leaderboard" }, "Leaderboard"), h("a", { class: "btn", href: "#/capability/evidence" }, `Evidence file (${c.completions.length})`), h("a", { class: "btn btn-link", href: "#/capability/readiness" }, "Two taps: readiness and load")));
     return el;
   });
-  route(/^capability\/deck$/, () => {
-    const c = st.capability; let tier = c.lastTier || "warm";
-    const el = screen("", topline(0, "Pick one", () => nav("/capability")));
-    el.append(h("h1", {}, em("Pick *one*")), h("p", { class: "help" }, "Mild, real, or the thing you have been avoiding. The right tier is the one that makes your body react a little when you read it."));
-    const tiers = h("div", { class: "tiers" }); const list = h("ul", { class: "deck" }); const note = h("p", { class: "help", style: { fontSize: "0.85rem" } });
-    const draw = () => { [...tiers.children].forEach(ch => ch.setAttribute("aria-checked", String(ch.dataset.t === tier))); note.textContent = CAP.tiers.find(t => t.id === tier).note; list.innerHTML = "";
-      CAP.deck.filter(x => x.tier === tier).forEach(x => { const done = c.completions.some(k => k.id === x.id); list.append(h("li", {}, h("button", { class: "card" + (done ? " done" : ""), onclick: () => { c.lastTier = tier; save(); nav("/capability/do/" + x.id); } }, h("span", { class: "cat" }, x.cat), h("span", {}, x.t, done ? " ✓" : "")))); }); };
-    CAP.tiers.forEach(t => tiers.append(h("button", { class: "chip", "data-t": t.id, role: "radio", onclick: () => { tier = t.id; draw(); } }, t.name)));
-    el.append(tiers, note, list); draw(); return el;
-  });
+  route(/^capability\/deck$/, () => { nav("/capability"); return screen(""); });
   route(/^capability\/do\/(\w+)$/, id => {
-    const x = CAP.deck.find(k => k.id === id); if (!x) { nav("/capability/deck"); return screen(""); }
-    const c = st.capability; let step = 0, before = 5, after = 5;
-    const el = screen("", topline(0, "Challenge", () => nav("/capability/deck")));
+    const x = CAP.deck.find(k => k.id === id); if (!x) { nav("/capability"); return screen(""); }
+    const c = capState(); let step = 0, before = 5, after = 5; const tier = CAP.tiers.find(t => t.id === x.tier);
+    const el = screen("", topline(0, "Challenge", () => nav("/capability")));
     const box = h("div", { style: { display: "contents" } }); el.append(box);
     const draw = () => { box.innerHTML = "";
-      box.append(h("p", { class: "eyebrow" }, `${CAP.tiers.find(t => t.id === x.tier).name} · ${x.cat}`), h("p", { class: "statement" }, x.t));
+      box.append(h("p", { class: "eyebrow" }, `${tier.name} · ${x.cat} · ${CAP.points[x.tier]} points`), h("p", { class: "statement" }, x.t));
       if (step === 0) { const s = slider(CAP.arousal.before, CAP.arousal.low, CAP.arousal.high, before, v => before = v); box.append(s.el, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => { before = s.get(); step = 1; draw(); } }, "Logged. I'm going to do it."), h("p", { class: "help", style: { fontSize: "0.82rem", textAlign: "center" } }, "Come back to this screen when it is done. It will be here."))); }
-      else if (step === 1) { const s = slider(CAP.arousal.after, CAP.arousal.low, CAP.arousal.high, after, v => after = v); const ta = h("textarea", { placeholder: CAP.notePrompt, maxlength: 240 });
-        box.append(h("div", { class: "callout" }, h("h3", {}, "Before"), `${before} / 10`), s.el, ta, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => { after = s.get(); c.completions.unshift({ id: x.id, tier: x.tier, cat: x.cat, t: x.t, before, after, note: ta.value.trim(), at: Date.now() }); save(); nav("/capability/evidence"); } }, "Add to the evidence file"), h("button", { class: "btn btn-link", onclick: () => { step = 0; draw(); } }, "I didn't do it yet"))); }
+      else { const s = slider(CAP.arousal.after, CAP.arousal.low, CAP.arousal.high, after, v => after = v); const ta = h("textarea", { placeholder: CAP.notePrompt, maxlength: 240 });
+        box.append(h("div", { class: "callout" }, h("h3", {}, "Before"), `${before} / 10`), s.el, ta, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => { after = s.get(); const was = capLevel(capPoints(c)); c.completions.unshift({ id: x.id, tier: x.tier, cat: x.cat, t: x.t, before, after, note: ta.value.trim(), at: Date.now() }); save(); syncLeaderboard(); const now = capLevel(capPoints(c)); nav(now > was ? "/capability/levelup/" + now : "/capability/evidence"); } }, `Done · +${CAP.points[x.tier]}`), h("button", { class: "btn btn-link", onclick: () => { step = 0; draw(); } }, "I didn't do it yet"))); }
     };
     draw(); return el;
   });
+  route(/^capability\/levelup\/(\d+)$/, n => {
+    const d = byId.capability; const el = screen("", topline(100, "Level up", () => nav("/capability")));
+    el.append(mark(d, true), h("p", { class: "eyebrow" }, "Capability"), h("h1", {}, em(`Level *${n}*`)), h("p", { class: "help", style: { fontSize: "1.05rem" } }, "Not a feeling. A record. Read the evidence file when you forget."), h("div", { class: "spacer" }), h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: "#/capability/evidence" }, "See the evidence file"), h("a", { class: "btn", href: "#/capability" }, "Back")));
+    return el;
+  });
+  route(/^capability\/leaderboard$/, () => {
+    const c = capState(); let win = c.lbWindow || "week";
+    const el = screen("", topline(0, "Leaderboard", () => nav("/capability")));
+    el.append(h("h1", {}, em("*Leaderboard*")));
+    if (!c.playerName) {
+      el.append(h("p", { class: "help" }, "Pick a name to appear on the board. First name, a handle, anything. Only the name and your points leave the device; never the challenges or your notes."));
+      const inp = h("input", { type: "text", placeholder: "Name on the board", maxlength: 24 });
+      el.append(inp, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: async () => { const v = inp.value.trim(); if (!v) return; c.playerName = v; save(); await syncLeaderboard(); render(); } }, "Join the board"), h("a", { class: "btn btn-link", href: "#/capability" }, "Not now")));
+      return el;
+    }
+    const tabs = h("div", { class: "tiers" }); const body = h("div", {}); const me = h("p", { class: "help" });
+    [["week", "This week"], ["month", "This month"], ["all", "All time"]].forEach(([k, l]) => tabs.append(h("button", { class: "chip", role: "radio", "aria-checked": String(k === win), onclick: () => { win = k; c.lbWindow = k; save(); load(); } }, l)));
+    el.append(h("p", { class: "help" }, `You are ${c.playerName}. `, h("a", { href: "#", onclick: e => { e.preventDefault(); c.playerName = null; save(); render(); } }, "Change name")), tabs, me, body);
+    async function load() {
+      [...tabs.children].forEach((t, i) => t.setAttribute("aria-checked", String(["week", "month", "all"][i] === win)));
+      body.innerHTML = ""; me.textContent = "Loading…";
+      try {
+        await syncLeaderboard();
+        const r = await fetch(`/api/leaderboard?window=${win}&id=${c.playerId}`); if (!r.ok) throw new Error(String(r.status)); const data = await r.json();
+        me.textContent = data.you ? `You: #${data.you.rank} of ${data.players} with ${data.you.points} points` : "No points in this window yet.";
+        const ul = h("ul", { class: "evidence" });
+        data.top.forEach((p, i) => ul.append(h("li", { style: { borderLeftColor: p.you ? "var(--em)" : "var(--hairline)", fontWeight: p.you ? 600 : 400, display: "grid", gridTemplateColumns: "32px 1fr auto", gap: "10px", alignItems: "center" } }, h("span", { style: { color: "var(--t-faint)" } }, `#${i + 1}`), h("span", {}, p.name, h("span", { style: { color: "var(--t-faint)", fontWeight: 400, fontSize: "0.8rem" } }, ` · L${p.level}`)), h("span", { class: "delta" }, `${p.points}`))));
+        body.append(data.top.length ? ul : h("p", { class: "help" }, "Nobody on the board in this window yet. Do one today."));
+      } catch { me.textContent = "The board is not reachable right now. Your points are safe on this device and will sync when it is."; }
+    }
+    load(); return el;
+  });
   route(/^capability\/evidence$/, () => {
-    const c = st.capability; const el = screen("", topline(0, "Evidence", () => nav("/capability")));
+    const c = capState(); const el = screen("", topline(0, "Evidence", () => nav("/capability")));
     el.append(h("h1", {}, em("The *evidence file*")), h("p", { class: "help" }, c.completions.length ? "Read this when you do not feel confident. It is the record, and the record is the point." : "Empty so far. The first line is the hardest to write."));
     const ul = h("ul", { class: "evidence" });
-    c.completions.forEach(k => { const dlt = k.before - k.after; ul.append(h("li", {}, h("div", {}, k.note || k.t), h("div", { class: "meta" }, h("span", {}, fmtDate(k.at)), h("span", {}, `${CAP.tiers.find(t => t.id === k.tier).name} · ${k.cat}`), h("span", { class: "delta " + (dlt > 0 ? "down" : dlt < 0 ? "up" : "") }, `${k.before} → ${k.after}`)))); });
-    el.append(ul, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: "#/capability/deck" }, "Pick the next one")));
+    c.completions.forEach(k => { const dlt = k.before - k.after; ul.append(h("li", {}, h("div", {}, k.note || k.t), h("div", { class: "meta" }, h("span", {}, fmtDate(k.at)), h("span", {}, `${CAP.tiers.find(t => t.id === k.tier).name} · ${k.cat} · +${CAP.points[k.tier]}`), h("span", { class: "delta " + (dlt > 0 ? "down" : dlt < 0 ? "up" : "") }, `${k.before} → ${k.after}`)))); });
+    el.append(ul, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: "#/capability" }, "Today's three")));
     return el;
   });
   route(/^capability\/readiness$/, () => {
-    const c = st.capability; const el = screen("", topline(0, "Two taps", () => nav("/capability")));
+    const c = capState(); const el = screen("", topline(0, "Two taps", () => nav("/capability")));
     el.append(h("h1", {}, CAP.readiness.title), h("p", { class: "help" }, "Daily, two taps. The scoreboard moves between challenges."));
     const a = slider(CAP.readiness.q1, "0 · empty", "10 · full", 5), b = slider(CAP.readiness.q2, "0 · light", "10 · crushing", 5);
     el.append(a.el, b.el, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => { c.readiness.unshift({ ready: a.get(), load: b.get(), at: Date.now() }); save(); nav("/capability"); } }, "Log it")));
