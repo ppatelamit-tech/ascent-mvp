@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ascent · Mental fitness for founders</title>
+  <meta name="description" content="Mental fitness for founders, designed by a psychiatrist. Seven capacities, each the working opposite of a block that stalls founders, trained in order. Not therapy. Training.">
+  <meta name="theme-color" content="#F5F6F8">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --canvas:#F5F6F8; --panel:#fff; --hairline:#E1E4EC; --t-strong:#232A40; --t-body:#495064; --t-faint:#6B7288; --accent:#3E6C9E; --em:#4C4F8B; --alt:#232A40; --alt-p:#B9BFD2; --alt-h:#F2F3F8; --display:'Cormorant Garamond',Georgia,serif; --body:'Archivo',system-ui,sans-serif; }
+    * { box-sizing:border-box; } html,body { margin:0; background:var(--canvas); color:var(--t-strong); font-family:var(--body); -webkit-font-smoothing:antialiased; line-height:1.55; }
+    a { color:var(--accent); }
+    .wrap { max-width:1040px; margin:0 auto; padding:0 20px; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:22px 0; }
+    .wordmark { font-family:var(--display); font-weight:600; font-size:1.3rem; text-decoration:none; color:var(--t-strong); }
+    .wordmark small { font-family:var(--body); font-weight:400; font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--t-faint); margin-left:10px; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:0 22px; border-radius:999px; border:1.5px solid var(--t-strong); background:var(--t-strong); color:#fff; font-weight:600; text-decoration:none; font-size:.98rem; }
+    .btn.ghost { background:transparent; color:var(--t-strong); border-color:#CCD1DD; }
+    .hero { padding:56px 0 48px; display:grid; grid-template-columns:1.15fr .85fr; gap:48px; align-items:center; }
+    .eyebrow { font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-weight:600; margin:0 0 14px; }
+    h1 { font-family:var(--display); font-weight:500; font-size:clamp(2.4rem,5.6vw,4rem); line-height:1.08; margin:0; letter-spacing:-.01em; }
+    h1 em { font-style:italic; color:var(--em); }
+    .lede { font-size:1.12rem; color:var(--t-body); margin:22px 0 28px; max-width:34em; }
+    .cta { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .cta .note { font-size:.82rem; color:var(--t-faint); }
+    .stack { list-style:none; margin:0; padding:0; display:flex; flex-direction:column-reverse; gap:8px; }
+    .stack li { display:grid; grid-template-columns:12px 1fr auto; gap:14px; align-items:center; background:var(--panel); border:1.5px solid var(--hairline); border-radius:14px; padding:12px 16px; }
+    .stack li i { display:block; width:12px; height:12px; border-radius:6px; }
+    .stack li b { font-weight:600; } .stack li span { font-size:.8rem; color:var(--t-faint); }
+    section { padding:56px 0; }
+    section h2 { font-family:var(--display); font-weight:500; font-size:clamp(1.7rem,3.4vw,2.4rem); margin:0 0 10px; line-height:1.15; }
+    .sub { color:var(--t-body); max-width:40em; margin:0 0 30px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; }
+    .card { background:var(--panel); border:1.5px solid var(--hairline); border-radius:18px; padding:20px 22px; }
+    .card h3 { font-family:var(--display); font-weight:500; font-size:1.35rem; margin:0 0 4px; }
+    .card .over { font-size:.74rem; letter-spacing:.1em; text-transform:uppercase; color:var(--t-faint); margin-bottom:10px; }
+    .card p { margin:0; color:var(--t-body); font-size:.95rem; }
+    .alt { background:var(--alt); color:var(--alt-p); }
+    .alt h2 { color:var(--alt-h); } .alt .sub { color:var(--alt-p); }
+    .alt .card { background:#2B3350; border-color:#3B4362; color:var(--alt-p); } .alt .card h3 { color:var(--alt-h); } .alt .card p { color:var(--alt-p); }
+    .steps { counter-reset:s; list-style:none; padding:0; margin:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; }
+    .steps li { counter-increment:s; background:var(--panel); border:1.5px solid var(--hairline); border-radius:18px; padding:20px 22px; }
+    .steps li::before { content:counter(s); display:block; font-family:var(--display); font-size:2rem; color:var(--em); line-height:1; margin-bottom:8px; }
+    .steps b { display:block; margin-bottom:4px; } .steps p { margin:0; color:var(--t-body); font-size:.95rem; }
+    .honest { border-left:3px solid var(--accent); padding:4px 0 4px 20px; color:var(--t-body); max-width:44em; }
+    footer { padding:40px 0 60px; font-size:.84rem; color:var(--t-faint); border-top:1px solid var(--hairline); }
+    footer p { margin:6px 0; }
+    @media (max-width:760px) { .hero { grid-template-columns:1fr; gap:30px; padding:30px 0 36px; } section { padding:40px 0; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="wordmark" href="/">Ascent <small>designed by a psychiatrist</small></a>
+      <a class="btn ghost" href="/app/">Open the app</a>
+    </header>
+
+    <div class="hero">
+      <div>
+        <p class="eyebrow">Mental fitness for founders</p>
+        <h1>Train the mind that <em>carries the company</em>.</h1>
+        <p class="lede">Seven capacities, each the working opposite of a block that stalls founders. Fear, guilt, shame, grief, lies, illusion, attachment. You train the capacity; the block loses its grip. Designed by a board-certified psychiatrist. Not therapy. Training.</p>
+        <div class="cta">
+          <a class="btn" href="/app/#/profile">Take the Profile · 12 minutes</a>
+          <span class="note">Free during the pilot. No account. Nothing leaves your device.</span>
+        </div>
+      </div>
+      <ol class="stack" aria-label="The seven capacities, bottom to top">
+        <li><i style="background:#A34457"></i><b>Capability</b><span>over fear</span></li>
+        <li><i style="background:#BF7440"></i><b>Enjoyment</b><span>over guilt</span></li>
+        <li><i style="background:#B3953A"></i><b>Drive</b><span>over shame</span></li>
+        <li><i style="background:#4E8C6E"></i><b>Connection</b><span>over grief</span></li>
+        <li><i style="background:#3E6C9E"></i><b>Communication</b><span>over lies</span></li>
+        <li><i style="background:#4C4F8B"></i><b>Vision</b><span>over illusion</span></li>
+        <li><i style="background:#7A5FA6"></i><b>Detachment</b><span>over attachment</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <section class="alt">
+    <div class="wrap">
+      <h2>Everyone sells you calm. This trains capacity.</h2>
+      <p class="sub">Meditation apps lower the noise. Coaches tell you what they did. Neither measures anything, and neither has a structural model of what actually goes wrong in a founder. Ascent does: seven blocks, seven capacities, trained in order from survival to letting go.</p>
+      <div class="grid">
+        <div class="card"><h3>A scoreboard, not a streak</h3><p>A baseline Profile on day one. Six-week blocks that end in a re-measure. You see the delta, not a mood log.</p></div>
+        <div class="card"><h3>Skills, not meditations</h3><p>Real-world challenges with an evidence file. Thirty-second truth drills graded by a rubric. Status scenarios with a sparring partner. Values made explicit before motivation is rebuilt on them.</p></div>
+        <div class="card"><h3>A human door</h3><p>When the Profile or the scoreboard says training alone will not move it, Ascent says so and points to a clinician. That is the feature nobody else ships.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>How a block works</h2>
+      <p class="sub">Six weeks on one capacity. A daily practice you do, a weekly lesson you watch, a number that moves.</p>
+      <ol class="steps">
+        <li><b>Baseline</b><p>Forty-two statements about the past month, one at a time. Twelve minutes. Seven readings and a recommendation on where to start.</p></li>
+        <li><b>Train</b><p>Capability: pick a challenge, rate your body before and after, write one line for the evidence file. Communication: a topic, thirty seconds, graded on six things.</p></li>
+        <li><b>Re-measure</b><p>At the end of the block the domain is scored again. The delta is the result. If two blocks move nothing, that is information too.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>The two blocks in the pilot</h2>
+      <p class="sub">The other five follow once these have been through their first hundred founders.</p>
+      <div class="grid">
+        <div class="card"><div class="over">Capability · over fear</div><h3>Confidence by evidence</h3><p>A deck of real challenges in three tiers: talk to a stranger, make the cold call, enter the race you are not sure you can finish. Each completion is a line in a file you read back when you do not feel confident. Confidence is a record, not a mood.</p></div>
+        <div class="card"><div class="over">Communication · over lies</div><h3>Say it in thirty seconds</h3><p>"Tell the board the real number." "Tell your co-founder what you actually think." Thirty seconds, transcribed on your device, graded on whether the hard thing came first, how specific you were, how many hedges, whether you owned it, whether you finished, and what it cost you to say.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>What this is not</h2>
+      <p class="honest">Ascent is a training program, not medical care. It does not diagnose, it does not treat, and using it does not make you anyone's patient. If you are dealing with depression, anxiety, or anything that is pressing on your whole life at once, a clinician is the right first step, and Ascent will tell you that when the numbers say so. In a crisis, call or text 988.</p>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <footer>
+      <p><strong>Ascent</strong> · designed by Amit Patel, MD, a board-certified psychiatrist. Working name; pilot build.</p>
+      <p>Training, not treatment. Nothing in this product is medical advice. In crisis, call or text 988 (US).</p>
+      <p>Nothing you enter leaves your device in the pilot, except the text of a Communication set, which is sent for grading and not stored.</p>
+    </footer>
+  </div>
+</body>
+</html>
