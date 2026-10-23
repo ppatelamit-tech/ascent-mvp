@@ -33,7 +33,7 @@ exports.handler = async (event) => {
     const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify({ model: process.env.GRADER_MODEL || "claude-sonnet-4-5", max_tokens: 600, system: RUBRIC, messages: [{ role: "user", content: user }] })
+      body: JSON.stringify({ model: process.env.GRADER_MODEL || "claude-sonnet-5-5", max_tokens: 600, system: RUBRIC, messages: [{ role: "user", content: user }] })
     });
     if (!r.ok) return { statusCode: 502, body: JSON.stringify({ error: "upstream", status: r.status }) };
     const data = await r.json();
