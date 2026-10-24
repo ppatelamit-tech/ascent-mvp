@@ -2,7 +2,7 @@
 
 Mental fitness for founders, designed by a psychiatrist. Working name. Pilot build.
 
-Seven capacities, each the working opposite of a block: capability/fear, enjoyment/guilt, drive/shame, connection/grief, communication/lies, vision/illusion, detachment/attachment. The MVP ships the Profile (baseline across all seven) plus three live blocks: **Enjoyment** (audio adventures in three grades, Calm / Active / Adventure, all three recorded with narration, sound beds, one-shots, and a composed ElevenLabs Music score), **Capability** (three challenges a day from chosen priority areas, points, levels, leaderboard, evidence file) and **Communication** (30-second sets graded against a six-dimension rubric).
+Seven capacities, each the working opposite of a block: capability/fear, enjoyment/guilt, drive/shame, connection/grief, communication/lies, vision/illusion, detachment/attachment. The MVP ships the Profile (baseline across all seven) plus three live blocks: **Enjoyment** (nine audio adventures in three grades, Calm / Active / Adventure, from 5 to 20 minutes, all recorded with narration, sound beds, one-shots, and a composed ElevenLabs Music score), **Capability** (three challenges a day from chosen priority areas, points, levels, leaderboard, evidence file) and **Communication** (30-second sets graded against a six-dimension rubric).
 
 ## Layout
 
