@@ -64,3 +64,20 @@ window.ASCENT_LOCAL_GRADE = function (topic, transcript, seconds, firstSentenceA
 
   return { total: scores.reduce((a, b) => a + b, 0), scores, notes, strongest, source: "offline" };
 };
+
+/* Offline estimate for Connection · Perform. Four dimensions 0–3: Stance, Direction, Lever, Hand-off. Heuristic; labeled "offline" in the UI. */
+window.ASCENT_LOCAL_GRADE_CONNECTION = function (item, e, transcript) {
+  const text = (transcript || "").trim(), lower = text.toLowerCase();
+  const words = text.split(/\s+/).filter(Boolean); const qs = (text.match(/\?/g) || []).length; const nums = (text.match(/\d+/g) || []).length;
+  const you = (lower.match(/\byou\b|\byour\b/g) || []).length, i = (lower.match(/\bi\b|\bi'll\b|\bi'm\b/g) || []).length, we = (lower.match(/\bwe\b|\bours?\b|\blet's\b/g) || []).length;
+  const leverHits = { contract: /\b(by|until|before) (monday|tuesday|wednesday|thursday|friday|saturday|sunday|the \d|next|\d)|\bagree|\bdeal\b|\bi'll .* you'll|\bown (this|the next|it)\b|\bowns? this\b|\bfrom now on\b|\bwrite (that|it) down\b/, alliance: /\bwe\b|\btogether\b|\bours\b|\bboth of us\b/, evidence: /\d|\bmeasure|\bdata\b|\bnumber|\btrial\b|\btest\b|\bresult/, consultation: /\?|\bwhat do you think\b|\byour (read|view|take)\b|\bwant my\b/, narrative: /\bwhere this goes\b|\bstory\b|\bnext (year|chapter)\b|\bstarted\b.*\bnow\b/, environment: /\bin front of\b|\bthe room\b|\bmeeting\b|\ball-hands\b|\bask (her|him|them)\b/, policy: /\brule\b|\bpolicy\b|\bsigned\b|\bnot negotiable\b|\bhas to\b/, none: /\bmust be nice\b|\bwhatever\b|\bobviously\b|\bseriously\b/ };
+  const leverUsed = e.levers.some(l => leverHits[l] && leverHits[l].test(lower));
+  const raise = /\bowns?\b|\byou (did|found|fixed|can)\b|\bwell done\b|\bgood\b|\bstrong\b|\byours\b|\bask (her|him|them)\b|\bwhat do you need\b/.test(lower), lower_ = /\bno\b|\bnot\b|\bstop\b|\bwrong\b|\bcan't\b|\bwon't\b|\bhas to\b/.test(lower);
+  const direction = e.shift === "raise" ? (raise ? 3 : lower_ ? 1 : 2) : e.shift === "lower" ? (lower_ || nums ? 3 : raise ? 1 : 2) : (!raise && !lower_ ? 3 : 2);
+  const stance = e.you === "H" ? (i >= 1 && you >= 1 ? 3 : 2) : e.you === "N" ? (we >= 1 ? 3 : 2) : (qs >= 1 || /\bcan i\b|\bhelp me understand\b/.test(lower) ? 3 : 2);
+  const leverScore = leverUsed ? (nums || qs || /\bby\b/.test(lower) ? 3 : 2) : 1;
+  const handoff = e.valence === "Harmful" ? (/\bmust be nice\b|\bobviously\b|\bactually\b|\bseriously\b|\bwhatever\b|\bsend me\b|\beverything\b|\bokay\b|\bfine\b/.test(lower) ? 3 : 2) : (/\byours\b|\bowns?\b|\bfrom now on\b|\bthen (it's|that's) (done|finished|yours)\b|\bask (her|him|them)\b|\bnext one\b/.test(lower) ? 3 : words.length > 40 ? 2 : 1);
+  const scores = [stance, direction, leverScore, handoff];
+  const notes = [`Stance read from pronouns: ${i} 'I', ${we} 'we', ${you} 'you', ${qs} questions.`, `Direction: ${e.shift}. ${raise ? "Raising language present." : ""} ${lower_ ? "Lowering language present." : ""}`.trim(), leverUsed ? `Something that looks like ${e.levers.join(" or ")} is in there.` : `No clear ${e.levers.join(" or ")}; the lever is what lets you hand off without losing.`, e.valence === "Harmful" ? "Harmful on purpose: was it unmistakable?" : "Was the hand-off said aloud, with a name on it?"];
+  return { total: scores.reduce((a, b) => a + b, 0), scores, notes, source: "offline" };
+};

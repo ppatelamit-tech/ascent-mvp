@@ -1,5 +1,6 @@
 /* Ascent MVP — single-file app. Vanilla JS, hash router, localStorage. No build step.
-   Domains: data/domains.js · Profile: data/profile.js · Capability: data/capability.js · Communication: data/communication.js */
+   Domains: data/domains.js · Profile: data/profile.js · Capability: data/capability.js · Communication: data/communication.js
+   Enjoyment: app/enjoyment.js · Drive, Connection, Vision, Detachment: app/development.js · Today/Foundations/Recovery: app/today.js */
 (function () {
   "use strict";
   const D = window.ASCENT_DOMAINS, P = window.ASCENT_PROFILE, CAP = window.ASCENT_CAPABILITY, COM = window.ASCENT_COMMUNICATION;

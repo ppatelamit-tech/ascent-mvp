@@ -16,12 +16,12 @@ window.ASCENT_DOMAINS = [
     line: "Define the self, then feed it.",
     body: "Follows a scent it has chosen, not the pack's. A trained hound does not chase everything.",
     trains: "Values made explicit, then motivation rebuilt on them: striving-toward, not striving-to-prove.",
-    status: "soon" },
+    status: "live" },
   { id: "connection", name: "Connection", block: "Grief", animal: "Elephant", color: "#4E8C6E",
     line: "Read and manage status.",
     body: "Lives in status hierarchies, remembers, and mourns.",
     trains: "The 27 status enactments: which you reach for, which you are missing, and how to hand off power on purpose.",
-    status: "soon" },
+    status: "live" },
   { id: "communication", name: "Communication", block: "Lies", animal: "Raven", color: "#3E6C9E",
     line: "Say it in 30 seconds.",
     body: "Speaks. Trained, it says what is true rather than what it has heard.",
@@ -31,10 +31,10 @@ window.ASCENT_DOMAINS = [
     line: "See clearly.",
     body: "Sees far and clearly. The trained hawk reads the ground, not the wish.",
     trains: "Wish separated from forecast. Calibration on your own predictions. The thesis treated as a hypothesis to attack.",
-    status: "soon" },
+    status: "live" },
   { id: "detachment", name: "Detachment", block: "Attachment", animal: "Cat", color: "#7A5FA6",
     line: "Hold it loosely.",
     body: "Attached to no outcome. Stays by choice and leaves when it must.",
     trains: "Identity held apart from outcome. Control released where it is not needed. The capacity to leave.",
-    status: "soon" }
+    status: "live" }
 ];
