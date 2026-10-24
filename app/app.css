@@ -158,3 +158,27 @@ label.lbl { display: block; font-size: 0.82rem; font-weight: 600; color: var(--t
 .fine { font-size: 0.78rem; color: var(--t-faint); line-height: 1.5; margin-top: 18px; }
 .testbar { background: #232A40; color: #E9ECF5; font-size: 0.8rem; text-align: center; padding: 0.45rem 1rem; }
 .testbar button { margin-left: 0.75rem; background: transparent; color: #E9ECF5; border: 1px solid #6B7288; border-radius: 999px; padding: 0.15rem 0.7rem; cursor: pointer; }
+
+/* ----- Today: three pillars ----- */
+.seven-ring { margin-top: 22px; background: var(--panel); border: 1.5px solid var(--hairline); border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.seven-ring .dots { display: flex; gap: 7px; }
+.seven-ring .dots span { width: 14px; height: 14px; border-radius: 7px; border: 2px solid #C9D0DC; }
+.seven-ring .dots span.on { background: var(--em); border-color: var(--em); }
+.seven-ring .r-label { font-size: 0.8rem; color: var(--t-body); text-align: right; }
+.pillar { display: block; margin-top: 12px; padding: 14px 16px; background: var(--panel); border: 1.5px solid var(--hairline); border-radius: 16px; text-decoration: none; color: var(--t-strong); transition: border-color 120ms, box-shadow 120ms; }
+.pillar:hover { border-color: #C6CBDA; box-shadow: 0 8px 26px rgba(35,42,64,0.06); }
+.pillar.done { border-color: var(--accent); background: var(--ok-bg); }
+.p-head { display: flex; align-items: baseline; gap: 10px; }
+.p-label { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.p-sub { font-size: 0.74rem; color: var(--t-faint); flex: 1; }
+.p-check { font-weight: 700; color: var(--accent); }
+.p-body { display: flex; gap: 12px; align-items: flex-start; margin-top: 10px; }
+.p-title { font-family: var(--font-display); font-size: 1.3rem; line-height: 1.25; }
+.p-line { font-size: 0.88rem; color: var(--t-body); margin-top: 4px; line-height: 1.45; }
+.steps { padding-left: 20px; margin: 12px 0 0; color: var(--t-body); font-size: 0.93rem; line-height: 1.5; }
+.steps li { margin-top: 8px; }
+.chip[aria-checked="true"] { border-color: var(--accent); }
+
+/* ----- Dull after dark: Ascent takes the same medicine ----- */
+html.night-red { filter: sepia(0.7) hue-rotate(-25deg) saturate(1.5) brightness(0.86); }
+html.night-grey { filter: grayscale(1) brightness(0.9); }

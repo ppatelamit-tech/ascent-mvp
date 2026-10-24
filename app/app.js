@@ -49,16 +49,16 @@
   }
   window.addEventListener("hashchange", render);
 
-  // ---------- home ----------
-  route(/^$/, () => {
+  // ---------- Development: the seven (Today lives in app/today.js) ----------
+  route(/^seven$/, () => {
     const el = screen("home");
-    el.append(h("div", { class: "wordmark" }, "Ascent", h("small", {}, "designed by a psychiatrist")));
+    el.append(topline(0, "Development", () => nav("/")));
     const pr = st.profile;
     if (pr.done && pr.scores) {
       const weakest = D.slice().sort((a, b) => pr.scores[a.id] - pr.scores[b.id])[0];
-      el.append(h("h1", {}, em("Your *seven*")), h("p", { class: "help" }, `Profile taken ${fmtDate(pr.doneAt)}. Weakest capacity: ${weakest.name}. Start there, or start at the bottom of the stack.`));
+      el.append(h("p", { class: "eyebrow" }, "Development · like working out"), h("h1", {}, em("Your *seven*")), h("p", { class: "help" }, `Profile taken ${fmtDate(pr.doneAt)}. Weakest capacity: ${weakest.name}. Start there, or start at the bottom of the stack.`));
     } else {
-      el.append(h("h1", {}, em("Train the mind that *carries the company*")), h("p", { class: "help" }, "Seven capacities, each the working opposite of a block that stalls founders. Take the Profile first; it tells you where to start."));
+      el.append(h("p", { class: "eyebrow" }, "Development · like working out"), h("h1", {}, em("Train the mind that *carries the company*")), h("p", { class: "help" }, "Seven capacities, each the working opposite of a block that stalls founders. Take the Profile first; it tells you where to start."));
       el.append(h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: "#/profile" }, pr.pos >= 0 ? "Continue the Profile" : "Take the Profile · 12 minutes")));
     }
     const ul = h("ul", { class: "domains" });
