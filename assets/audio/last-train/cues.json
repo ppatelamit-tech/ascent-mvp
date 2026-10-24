@@ -1,0 +1,51 @@
+{
+ "id": "last-train",
+ "duration": 418.51,
+ "scenes": [
+  {
+   "id": "doorway",
+   "start": 1.5,
+   "end": 38.25
+  },
+  {
+   "id": "streets",
+   "start": 43.25,
+   "end": 77.76
+  },
+  {
+   "id": "spotted",
+   "start": 82.76,
+   "end": 120.95
+  },
+  {
+   "id": "yard",
+   "start": 124.95,
+   "end": 165.78
+  },
+  {
+   "id": "surrounded",
+   "start": 170.78,
+   "end": 218.51
+  },
+  {
+   "id": "move",
+   "start": 224.51,
+   "end": 274.3
+  },
+  {
+   "id": "run",
+   "start": 279.3,
+   "end": 313.18
+  },
+  {
+   "id": "aboard",
+   "start": 318.18,
+   "end": 364.62
+  },
+  {
+   "id": "end",
+   "start": 372.62,
+   "end": 413.79
+  }
+ ]
+}

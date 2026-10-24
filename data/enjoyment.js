@@ -53,7 +53,7 @@ window.ASCENT_ENJOYMENT = {
       ]
     },
     {
-      id: "ridge-before-dawn", grade: "active", title: "The Ridge Before Dawn", minutes: 10,
+      id: "ridge-before-dawn", grade: "active", title: "The Ridge Before Dawn", minutes: 6,
       blurb: "A climb in the dark to catch the sun from the top. The weather has other ideas, and so does your footing.",
       bed: "Seamless loop: steady wind over an exposed mountain ridge before dawn, occasional small rocks shifting, distant night birds, no music, no voices",
       scenes: [
@@ -81,7 +81,7 @@ window.ASCENT_ENJOYMENT = {
       ]
     },
     {
-      id: "last-train", grade: "adventure", title: "The Last Train Out of Varro", minutes: 11,
+      id: "last-train", grade: "adventure", title: "The Last Train Out of Varro", minutes: 7,
       blurb: "A city under curfew, something in your coat that cannot be found, and one train leaving at midnight. They know you are coming.",
       bed: "Seamless loop: tense night city under curfew, distant sirens, wind through empty streets, far-off train yard clanks, low electrical hum, no music, no voices",
       scenes: [

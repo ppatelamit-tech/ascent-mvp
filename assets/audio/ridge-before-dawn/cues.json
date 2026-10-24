@@ -1,0 +1,46 @@
+{
+ "id": "ridge-before-dawn",
+ "duration": 350.07,
+ "scenes": [
+  {
+   "id": "trailhead",
+   "start": 1.5,
+   "end": 33.94
+  },
+  {
+   "id": "climb",
+   "start": 38.94,
+   "end": 78.02
+  },
+  {
+   "id": "weather",
+   "start": 84.02,
+   "end": 124.93
+  },
+  {
+   "id": "slip",
+   "start": 129.93,
+   "end": 167.0
+  },
+  {
+   "id": "steady",
+   "start": 173.0,
+   "end": 226.31
+  },
+  {
+   "id": "push",
+   "start": 232.31,
+   "end": 267.87
+  },
+  {
+   "id": "summit",
+   "start": 272.87,
+   "end": 317.46
+  },
+  {
+   "id": "end",
+   "start": 327.46,
+   "end": 346.29
+  }
+ ]
+}
