@@ -1,0 +1,56 @@
+{
+ "id": "rooftops-of-kessar",
+ "duration": 590.89,
+ "scenes": [
+  {
+   "id": "ledge",
+   "start": 1.5,
+   "end": 55.13
+  },
+  {
+   "id": "roofs",
+   "start": 61.13,
+   "end": 100.94
+  },
+  {
+   "id": "bell-tower",
+   "start": 110.94,
+   "end": 166.74
+  },
+  {
+   "id": "courtyard",
+   "start": 196.74,
+   "end": 242.14
+  },
+  {
+   "id": "trapped",
+   "start": 252.14,
+   "end": 304.33
+  },
+  {
+   "id": "leap",
+   "start": 316.33,
+   "end": 359.02
+  },
+  {
+   "id": "market",
+   "start": 369.02,
+   "end": 411.93
+  },
+  {
+   "id": "harbor",
+   "start": 421.93,
+   "end": 463.02
+  },
+  {
+   "id": "deck",
+   "start": 475.02,
+   "end": 517.94
+  },
+  {
+   "id": "end",
+   "start": 539.94,
+   "end": 581.27
+  }
+ ]
+}

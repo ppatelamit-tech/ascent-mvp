@@ -1,0 +1,61 @@
+{
+ "id": "vault-under-the-opera",
+ "duration": 835.06,
+ "scenes": [
+  {
+   "id": "descent",
+   "start": 1.5,
+   "end": 56.75
+  },
+  {
+   "id": "cellars",
+   "start": 71.75,
+   "end": 131.46
+  },
+  {
+   "id": "vault",
+   "start": 166.46,
+   "end": 202.91
+  },
+  {
+   "id": "box",
+   "start": 214.91,
+   "end": 261.59
+  },
+  {
+   "id": "sealed",
+   "start": 296.59,
+   "end": 345.59
+  },
+  {
+   "id": "dark",
+   "start": 360.59,
+   "end": 408.47
+  },
+  {
+   "id": "vent",
+   "start": 478.47,
+   "end": 525.47
+  },
+  {
+   "id": "duct",
+   "start": 535.47,
+   "end": 593.67
+  },
+  {
+   "id": "pit",
+   "start": 633.67,
+   "end": 677.63
+  },
+  {
+   "id": "street",
+   "start": 689.63,
+   "end": 744.88
+  },
+  {
+   "id": "end",
+   "start": 784.88,
+   "end": 825.48
+  }
+ ]
+}

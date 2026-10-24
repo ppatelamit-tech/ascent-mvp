@@ -1,0 +1,41 @@
+{
+ "id": "river-crossing",
+ "duration": 358.9,
+ "scenes": [
+  {
+   "id": "put-in",
+   "start": 1.5,
+   "end": 37.78
+  },
+  {
+   "id": "rhythm",
+   "start": 49.78,
+   "end": 85.1
+  },
+  {
+   "id": "third",
+   "start": 115.1,
+   "end": 153.79
+  },
+  {
+   "id": "capsize",
+   "start": 161.79,
+   "end": 198.39
+  },
+  {
+   "id": "eddy",
+   "start": 204.39,
+   "end": 245.29
+  },
+  {
+   "id": "beach",
+   "start": 265.29,
+   "end": 306.7
+  },
+  {
+   "id": "end",
+   "start": 336.7,
+   "end": 355.14
+  }
+ ]
+}

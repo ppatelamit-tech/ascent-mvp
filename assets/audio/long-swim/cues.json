@@ -1,0 +1,71 @@
+{
+ "id": "long-swim",
+ "duration": 1196.9,
+ "scenes": [
+  {
+   "id": "shore",
+   "start": 1.5,
+   "end": 60.9
+  },
+  {
+   "id": "first-strokes",
+   "start": 70.9,
+   "end": 129.99
+  },
+  {
+   "id": "deep-water",
+   "start": 154.99,
+   "end": 214.63
+  },
+  {
+   "id": "sighting",
+   "start": 294.63,
+   "end": 338.1
+  },
+  {
+   "id": "current",
+   "start": 363.1,
+   "end": 412.26
+  },
+  {
+   "id": "cramp",
+   "start": 424.26,
+   "end": 481.57
+  },
+  {
+   "id": "float",
+   "start": 491.57,
+   "end": 541.94
+  },
+  {
+   "id": "seam",
+   "start": 561.94,
+   "end": 615.72
+  },
+  {
+   "id": "long-middle",
+   "start": 670.72,
+   "end": 734.59
+  },
+  {
+   "id": "cold",
+   "start": 864.59,
+   "end": 918.87
+  },
+  {
+   "id": "island-grows",
+   "start": 940.87,
+   "end": 1000.82
+  },
+  {
+   "id": "sand",
+   "start": 1070.82,
+   "end": 1121.66
+  },
+  {
+   "id": "end",
+   "start": 1166.66,
+   "end": 1191.34
+  }
+ ]
+}
