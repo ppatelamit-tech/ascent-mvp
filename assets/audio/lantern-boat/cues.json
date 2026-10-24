@@ -1,6 +1,6 @@
 {
  "id": "lantern-boat",
- "duration": 401.11,
+ "duration": 781.43,
  "scenes": [
   {
    "id": "shore",
@@ -13,34 +13,54 @@
    "end": 93.18
   },
   {
-   "id": "fog",
+   "id": "open-water",
    "start": 101.18,
-   "end": 146.11
+   "end": 152.83
+  },
+  {
+   "id": "fog",
+   "start": 197.83,
+   "end": 242.76
+  },
+  {
+   "id": "stillness",
+   "start": 249.76,
+   "end": 284.45
   },
   {
    "id": "sound",
-   "start": 153.11,
-   "end": 198.12
+   "start": 304.45,
+   "end": 349.46
   },
   {
    "id": "lanterns",
-   "start": 206.12,
-   "end": 261.03
+   "start": 357.46,
+   "end": 412.37
+  },
+  {
+   "id": "among",
+   "start": 420.37,
+   "end": 470.89
   },
   {
    "id": "gift",
-   "start": 269.03,
-   "end": 317.8
+   "start": 525.89,
+   "end": 574.66
   },
   {
    "id": "release",
-   "start": 327.8,
-   "end": 363.77
+   "start": 584.66,
+   "end": 620.63
+  },
+  {
+   "id": "rest",
+   "start": 632.63,
+   "end": 666.27
   },
   {
    "id": "end",
-   "start": 375.77,
-   "end": 397.4
+   "start": 756.27,
+   "end": 777.9
   }
  ]
 }

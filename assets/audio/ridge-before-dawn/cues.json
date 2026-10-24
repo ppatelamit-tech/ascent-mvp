@@ -1,6 +1,6 @@
 {
  "id": "ridge-before-dawn",
- "duration": 350.07,
+ "duration": 591.78,
  "scenes": [
   {
    "id": "trailhead",
@@ -13,34 +13,49 @@
    "end": 78.02
   },
   {
-   "id": "weather",
+   "id": "treeline",
    "start": 84.02,
-   "end": 124.93
+   "end": 135.01
+  },
+  {
+   "id": "weather",
+   "start": 160.01,
+   "end": 200.92
   },
   {
    "id": "slip",
-   "start": 129.93,
-   "end": 167.0
+   "start": 205.92,
+   "end": 242.99
   },
   {
    "id": "steady",
-   "start": 173.0,
-   "end": 226.31
+   "start": 248.99,
+   "end": 302.31
+  },
+  {
+   "id": "ridge-walk",
+   "start": 308.31,
+   "end": 357.86
   },
   {
    "id": "push",
-   "start": 232.31,
-   "end": 267.87
+   "start": 377.86,
+   "end": 413.41
   },
   {
    "id": "summit",
-   "start": 272.87,
-   "end": 317.46
+   "start": 418.41,
+   "end": 463.0
+  },
+  {
+   "id": "warmth",
+   "start": 473.0,
+   "end": 519.29
   },
   {
    "id": "end",
-   "start": 327.46,
-   "end": 346.29
+   "start": 569.29,
+   "end": 588.13
   }
  ]
 }
