@@ -1,0 +1,41 @@
+{
+ "id": "lighthouse-tea",
+ "duration": 307.41,
+ "scenes": [
+  {
+   "id": "stairs",
+   "start": 1.5,
+   "end": 43.37
+  },
+  {
+   "id": "kitchen",
+   "start": 49.37,
+   "end": 96.06
+  },
+  {
+   "id": "dark",
+   "start": 104.06,
+   "end": 141.12
+  },
+  {
+   "id": "relight",
+   "start": 148.12,
+   "end": 192.24
+  },
+  {
+   "id": "biscuits",
+   "start": 200.24,
+   "end": 237.96
+  },
+  {
+   "id": "window",
+   "start": 245.96,
+   "end": 274.26
+  },
+  {
+   "id": "end",
+   "start": 286.26,
+   "end": 303.65
+  }
+ ]
+}

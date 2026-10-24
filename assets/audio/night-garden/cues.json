@@ -1,0 +1,41 @@
+{
+ "id": "night-garden",
+ "duration": 303.49,
+ "scenes": [
+  {
+   "id": "wall",
+   "start": 1.5,
+   "end": 36.58
+  },
+  {
+   "id": "garden",
+   "start": 42.58,
+   "end": 82.13
+  },
+  {
+   "id": "gate",
+   "start": 90.13,
+   "end": 132.82
+  },
+  {
+   "id": "key",
+   "start": 139.82,
+   "end": 180.8
+  },
+  {
+   "id": "table",
+   "start": 188.8,
+   "end": 229.63
+  },
+  {
+   "id": "fountain",
+   "start": 237.63,
+   "end": 267.1
+  },
+  {
+   "id": "end",
+   "start": 279.1,
+   "end": 299.71
+  }
+ ]
+}

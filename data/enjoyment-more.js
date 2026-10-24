@@ -4,7 +4,7 @@
   const more = [
     // ───────────────────────── CALM ─────────────────────────
     {
-      id: "night-garden", grade: "calm", title: "The Night Garden", minutes: 6,
+      id: "night-garden", grade: "calm", title: "The Night Garden", minutes: 5,
       blurb: "A walled garden after dark, a gate that should not be locked, and a key that was in your pocket the whole time.",
       bed: "Seamless loop: quiet walled garden at night, soft crickets, a distant fountain, leaves moving in a light breeze, no music, no voices",
       scenes: [
@@ -28,7 +28,7 @@
       ]
     },
     {
-      id: "lighthouse-tea", grade: "calm", title: "The Lighthouse Keeper's Tea", minutes: 6,
+      id: "lighthouse-tea", grade: "calm", title: "The Lighthouse Keeper's Tea", minutes: 5,
       blurb: "A storm on the rocks, a kitchen with the kettle on, and the one minute when the lamp goes out.",
       bed: "Seamless loop: inside a stone lighthouse during a storm, wind and rain against thick windows, waves breaking far below, a kettle ticking as it warms, no music, no voices",
       scenes: [
