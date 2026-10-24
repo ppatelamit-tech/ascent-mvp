@@ -31,3 +31,24 @@ for name in os.listdir(SRC):
 total = dur(os.path.join(OUT, "narration.mp3"))
 json.dump({"id": ID, "duration": round(total, 2), "scenes": cues}, open(os.path.join(OUT, "cues.json"), "w"), indent=1)
 print(f"{ID}: {len(cues)} scenes, {total/60:.1f} min → {OUT}")
+
+# ---- optional composed score: <SRC>/music-A.mp3, music-B.mp3 ... placed at the scene boundaries listed in <SRC>/music.json
+#      music.json: [{"file":"music-A.mp3","start":0.0}, {"file":"music-B.mp3","start":101.18}, ...]
+#      Cues are cross-faded over XF seconds at each start, ducked under narration, and written to assets/audio/<id>/music.mp3.
+mj = os.path.join(SRC, "music.json")
+if os.path.exists(mj):
+    cues_m = json.load(open(mj)); XF = 6.0
+    narr_path = os.path.join(OUT, "narration.mp3")
+    inputs, filt, n = ["-i", narr_path], [], 1
+    for i, c in enumerate(cues_m):
+        inputs += ["-i", os.path.join(SRC, c["file"])]
+        start = max(0.0, c["start"] - (XF / 2 if i else 0))
+        fade_in = f"afade=t=in:st=0:d={XF if i else 2}"
+        nxt = cues_m[i + 1]["start"] + XF / 2 if i + 1 < len(cues_m) else total + 2
+        length = nxt - start
+        filt.append(f"[{n}:a]atrim=0:{length:.2f},{fade_in},afade=t=out:st={max(0, length - (XF if i + 1 < len(cues_m) else 8)):.2f}:d={XF if i + 1 < len(cues_m) else 8},adelay={int(start * 1000)}|{int(start * 1000)},aformat=channel_layouts=stereo[m{i}]")
+        n += 1
+    mix = "".join(f"[m{i}]" for i in range(len(cues_m))) + f"amix=inputs={len(cues_m)}:normalize=0,volume=0.9[mus];"
+    duck = "[0:a]aformat=channel_layouts=stereo[nar];[mus][nar]sidechaincompress=threshold=0.03:ratio=4:attack=200:release=1200:makeup=1[out]"
+    subprocess.check_call(["ffmpeg", "-y", "-v", "error", *inputs, "-filter_complex", ";".join(filt) + ";" + mix + duck, "-map", "[out]", "-t", str(total), "-ar", "44100", "-b:a", "128k", os.path.join(OUT, "music.mp3")])
+    print(f"  composed score: {len(cues_m)} cues → music.mp3 ({dur(os.path.join(OUT, 'music.mp3'))/60:.1f} min)")

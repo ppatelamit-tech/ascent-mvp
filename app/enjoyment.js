@@ -43,13 +43,16 @@
           nextBeat += beat; step++;
         }
       }
-      function setMood(m, fade) { mood = Object.assign({}, mood, m); const t = ctx.currentTime, f = fade == null ? 4 : fade; lp.frequency.cancelScheduledValues(t); lp.frequency.linearRampToValueAtTime(300 + mood.intensity * 1800, t + f); drone[0].g.gain.linearRampToValueAtTime(0.06 + mood.intensity * 0.08, t + f); music.gain.cancelScheduledValues(t); music.gain.linearRampToValueAtTime(0.35 + mood.intensity * 0.35, t + f); const third = mood.mode === "major" ? 4 : 3; drone[1].o.frequency.linearRampToValueAtTime(root * Math.pow(2, (mood.intensity > 0.5 ? 7 : third) / 12), t + f); }
+      let setMood = function (m, fade) { mood = Object.assign({}, mood, m); const t = ctx.currentTime, f = fade == null ? 4 : fade; lp.frequency.cancelScheduledValues(t); lp.frequency.linearRampToValueAtTime(300 + mood.intensity * 1800, t + f); drone[0].g.gain.linearRampToValueAtTime(0.06 + mood.intensity * 0.08, t + f); music.gain.cancelScheduledValues(t); music.gain.linearRampToValueAtTime(0.35 + mood.intensity * 0.35, t + f); const third = mood.mode === "major" ? 4 : 3; drone[1].o.frequency.linearRampToValueAtTime(root * Math.pow(2, (mood.intensity > 0.5 ? 7 : third) / 12), t + f); };
       function start() { if (running) return; running = true; ctx.resume(); nextBeat = ctx.currentTime + 0.1; step = 0; timer = setInterval(schedule, 200); }
       function stop(fade) { const t = ctx.currentTime; music.gain.cancelScheduledValues(t); music.gain.linearRampToValueAtTime(0.0001, t + (fade || 1.5)); amb.gain.cancelScheduledValues(t); amb.gain.linearRampToValueAtTime(0.0001, t + (fade || 1.5)); setTimeout(() => { running = false; clearInterval(timer); if (bedNode) { try { bedNode.stop(); } catch {} } try { ctx.close(); } catch {} }, (fade || 1.5) * 1000 + 100); }
       // ambient bed: engine noise fallback, shaped by grade
       function noiseBed(grade) { const s = ctx.createBufferSource(); s.buffer = noiseBuf; s.loop = true; const f = ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = grade === "calm" ? 500 : grade === "active" ? 900 : 700; const g = ctx.createGain(); g.gain.value = 0.35; const lfo = ctx.createOscillator(); lfo.frequency.value = grade === "calm" ? 0.08 : 0.2; const lg = ctx.createGain(); lg.gain.value = 0.15; lfo.connect(lg); lg.connect(g.gain); lfo.start(); s.connect(f); f.connect(g); g.connect(amb); s.start(); bedNode = s; amb.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 3); }
       function fileBed(el) { bedSrc = ctx.createMediaElementSource(el); bedSrc.connect(amb); el.loop = true; el.play().catch(() => {}); amb.gain.linearRampToValueAtTime(0.8, ctx.currentTime + 3); }
-      return { ctx, master, setMood, start, stop, noiseBed, fileBed, sfx: (el, gain) => { const s = ctx.createMediaElementSource(el); const g = ctx.createGain(); g.gain.value = gain || 0.8; s.connect(g); g.connect(master); return el.play().catch(() => {}); } };
+      let scoreMuted = false;
+      function muteScore() { scoreMuted = true; music.gain.cancelScheduledValues(ctx.currentTime); music.gain.setValueAtTime(0.0001, ctx.currentTime); }
+      const _setMood = setMood; setMood = function (m, fade) { _setMood(m, fade); if (scoreMuted) { music.gain.cancelScheduledValues(ctx.currentTime); music.gain.setValueAtTime(0.0001, ctx.currentTime); } };
+      return { ctx, master, setMood: (m, f) => setMood(m, f), muteScore, start, stop, noiseBed, fileBed, sfx: (el, gain) => { const s = ctx.createMediaElementSource(el); const g = ctx.createGain(); g.gain.value = gain || 0.8; s.connect(g); g.connect(master); return el.play().catch(() => {}); } };
     }
 
     // ---------- helpers ----------
@@ -96,7 +99,10 @@
         const narrUrl = base(a.id) + "narration.mp3", cuesUrl = base(a.id) + "cues.json";
         if (await exists(narrUrl) && await exists(cuesUrl)) {
           cues = await (await fetch(cuesUrl)).json(); narr = new Audio(narrUrl); narr.crossOrigin = "anonymous"; const src = eng.ctx.createMediaElementSource(narr); const g = eng.ctx.createGain(); g.gain.value = 1; src.connect(g); g.connect(eng.master);
-          narr.onended = finish; await narr.play(); btn.textContent = "Pause";
+          const musicUrl = base(a.id) + "music.mp3"; let music = null;
+          if (await exists(musicUrl)) { music = new Audio(musicUrl); music.crossOrigin = "anonymous"; const ms = eng.ctx.createMediaElementSource(music); const mg = eng.ctx.createGain(); mg.gain.value = 0.85; ms.connect(mg); mg.connect(eng.master); eng.muteScore(); }
+          narr.onended = finish; await narr.play(); if (music) { music.currentTime = narr.currentTime; music.play().catch(() => {}); } btn.textContent = "Pause";
+          narr.onpause = () => { if (music) music.pause(); }; narr.onplay = () => { if (music) { music.currentTime = narr.currentTime; music.play().catch(() => {}); } };
           const loop = () => { if (finished) return; const t = narr.currentTime; const i = cues.scenes.findIndex((c, k) => t >= c.start && (k === cues.scenes.length - 1 || t < cues.scenes[k + 1].start)); if (i >= 0) setScene(i); ring.style.setProperty("--pct", Math.round(t / narr.duration * 100) + "%"); raf = requestAnimationFrame(loop); }; loop();
           btn.disabled = false; btn.onclick = () => { if (narr.paused) { narr.play(); eng.ctx.resume(); btn.textContent = "Pause"; } else { narr.pause(); btn.textContent = "Resume"; } };
         } else {
