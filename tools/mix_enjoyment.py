@@ -8,7 +8,7 @@ import json, os, shutil, subprocess, sys
 ID, SRC = sys.argv[1], sys.argv[2]
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "assets", "audio", ID); os.makedirs(OUT, exist_ok=True)
-adv = json.loads(subprocess.check_output(["node", "-e", f"global.window={{}};require('{ROOT}/data/enjoyment.js');const a=window.ASCENT_ENJOYMENT.adventures.find(x=>x.id==='{ID}');console.log(JSON.stringify(a))"]))
+adv = json.loads(subprocess.check_output(["node", "-e", f"global.window={{}};require('{ROOT}/data/enjoyment.js');require('{ROOT}/data/enjoyment-more.js');const a=window.ASCENT_ENJOYMENT.adventures.find(x=>x.id==='{ID}');console.log(JSON.stringify(a))"]))
 def dur(p): return float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", p]).decode().strip())
 parts, cues, t = [], [], 0.0
 LEAD = 1.5
