@@ -339,6 +339,9 @@
     return el;
   });
 
+  // ---------- plugins ----------
+  (window.ASCENT_PLUGINS || []).forEach(p => { try { p({ route, h, em, screen, topline, nav, mark, byId, slider, fmtDate, state: () => st, save }); } catch (e) { console.error(e); } });
+
   // ---------- boot ----------
   const tb = document.getElementById("testbar"); if (tb) { tb.hidden = !st.testMode; const r = document.getElementById("reset"); if (r) r.onclick = () => { st = fresh(); st.testMode = true; save(); nav("/"); render(); }; }
   render();

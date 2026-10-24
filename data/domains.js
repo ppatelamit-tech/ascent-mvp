@@ -11,7 +11,7 @@ window.ASCENT_DOMAINS = [
     line: "Permission to enjoy what is not earned.",
     body: "Plays without purpose. The point is the play.",
     trains: "Rest and pleasure without a ledger. Naming the guilt rule and breaking it on schedule.",
-    status: "soon" },
+    status: "live" },
   { id: "drive", name: "Drive", block: "Shame", animal: "Hound", color: "#B3953A",
     line: "Define the self, then feed it.",
     body: "Follows a scent it has chosen, not the pack's. A trained hound does not chase everything.",

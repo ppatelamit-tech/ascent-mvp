@@ -126,8 +126,9 @@ label.lbl { display: block; font-size: 0.82rem; font-weight: 600; color: var(--t
 .topic { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.5rem, 5vw, 2rem); line-height: 1.25; margin: 26px 0 0; }
 .timer { display: flex; flex-direction: column; align-items: center; margin-top: 30px; }
 .ring { width: 160px; height: 160px; border-radius: 80px; display: flex; align-items: center; justify-content: center; background: conic-gradient(var(--accent) var(--pct, 0%), var(--hairline) 0); position: relative; }
-.ring::after { content: ""; position: absolute; inset: 8px; border-radius: 72px; background: var(--canvas); }
-.ring .t { position: relative; font-family: var(--font-display); font-size: 3rem; color: var(--em); }
+.ring::after { content: ""; position: absolute; inset: 8px; border-radius: 50%; background: var(--canvas); }
+.ring .t { position: relative; z-index: 1; font-family: var(--font-display); font-size: 3rem; color: var(--em); }
+.ring::after { pointer-events: none; }
 .ring.live { background: conic-gradient(var(--crisis) var(--pct, 0%), var(--hairline) 0); }
 .mic-note { font-size: 0.82rem; color: var(--t-faint); margin-top: 14px; text-align: center; }
 .live-text { margin-top: 18px; min-height: 60px; font-size: 0.98rem; line-height: 1.5; color: var(--t-body); }
