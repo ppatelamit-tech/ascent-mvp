@@ -1,4 +1,4 @@
-/* Today — the three pillars. Development (the seven, parallel to working out) · Foundations (parallel to diet and nutrition) · Recovery (liminal rituals, parallel to recovery).
+/* Today — the three pillars (tile view, reached from the Guide as "Browse"). Development (the seven, parallel to working out) · Foundations (parallel to diet and nutrition) · Recovery (liminal rituals, parallel to recovery).
    One activity from each, every day. All three done closes the day. Seven closed days in the first ten: founding member.
    Registers through window.ASCENT_PLUGINS. Owns state.today. */
 (function () {
@@ -73,8 +73,10 @@
     }
     function ring(p) { const dots = []; for (let i = 0; i < GOAL; i++) dots.push(h("span", { class: i < p.closed ? "on" : "" })); return h("div", { class: "seven-ring" }, h("div", { class: "dots" }, ...dots), h("div", { class: "r-label" }, p.won ? "Seven days. The app is yours." : p.over ? `${p.closed} of ${GOAL} in your ten days` : `Day ${p.idx} of ${WINDOW} · ${p.closed} of ${GOAL} closed`)); }
 
-    // ---------- Today ----------
-    route(/^$/, () => {
+    window.ASCENT_TODAY = { dayKey, devDone, foundDone, recDone, dayClosed, program, pickDevelopment, microAction, ritualName, GOAL, WINDOW };
+
+    // ---------- Today (tiles; the Guide in guide.js owns the home route) ----------
+    route(/^today$/, () => {
       const s = S(); const t = T(); const p = program(); const day = dayKey();
       if (p.won && !t.founding) { t.founding = Date.now(); save(); nav("/founding"); return screen(""); }
       const el = screen("home today");
@@ -91,7 +93,7 @@
       el.append(tile("Recovery", "liminal rituals · like recovery", !!rec, "#/recovery",
         h("div", { class: "p-body" }, h("div", {}, h("div", { class: "p-title" }, rec ? `Crossed · ${ritualName(rec.id)}` : "A ritual for what happened"), h("div", { class: "p-line" }, rec ? "Bounded, finished, back in the room." : quiet)))));
       if (!p.won) el.append(h("p", { class: "fine" }, `Close ${GOAL} of your first ${WINDOW} days and Ascent is free for your first year, with the founder's rate locked after. Closing a day means all three, honestly. Nobody checks but you.`));
-      el.append(h("div", { class: "actions row", style: { marginTop: "14px" } }, h("a", { class: "btn btn-link", href: "#/seven" }, "The seven"), h("a", { class: "btn btn-link", href: "#/profile/report" }, "Profile")));
+      el.append(h("div", { class: "actions row", style: { marginTop: "14px" } }, h("a", { class: "btn btn-link", href: "#/" }, "Back to the Guide"), h("a", { class: "btn btn-link", href: "#/seven" }, "The seven"), h("a", { class: "btn btn-link", href: "#/profile/report" }, "Profile")));
       return el;
     });
     function ritualName(id) { const r = R.rituals.find(x => x.id === id) || T().rituals.find(x => x.id === id); return r ? r.name : "ritual"; }
