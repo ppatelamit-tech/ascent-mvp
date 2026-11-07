@@ -136,7 +136,7 @@
         if (pos >= CN.baseline.items.length) { const counts = {}; let harm = 0, heal = 0; picks.forEach(tag => { const [cl, val] = CN.baseline.tags[tag]; counts[cl] = (counts[cl] || 0) + 1; if (val === "Harmful") harm++; if (val === "Healing") heal++; }); st.baseline = { counts, harm, heal, at: Date.now() }; logIt("connection", "baseline"); nav("/connection/baseline/result"); return; }
         const it = CN.baseline.items[pos];
         box.append(h("p", { class: "eyebrow" }, `${pos + 1} of ${CN.baseline.items.length}`), pos === 0 ? h("p", { class: "help" }, CN.baseline.intro) : null, h("p", { class: "statement" }, it.t));
-        const opts = h("div", { class: "options", role: "radiogroup" }); it.opts.forEach(([t, tag]) => opts.append(h("button", { class: "opt", role: "radio", "aria-checked": "false", onclick: () => { picks.push(tag); pos++; draw(); } }, h("span", { class: "dot" }), t))); box.append(opts);
+        const opts = h("div", { class: "options", role: "radiogroup" }); it.opts.forEach(([t, tag]) => opts.append(h("button", { class: "opt", role: "radio", "aria-checked": "false", onclick: ev => window.ASCENT_SETTLE(ev, () => { picks.push(tag); pos++; draw(); }) }, h("span", { class: "dot" }), t))); box.append(opts);
       }
       draw(); return el;
     });

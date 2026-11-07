@@ -13,6 +13,8 @@
   function load() { try { const s = localStorage.getItem(KEY); return s ? JSON.parse(s) : null; } catch { return null; } }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch {} }
   let st = load() || fresh();
+  // One tap per screen: mark the choice, lock the group, advance after a beat. Stops a fast double-tap answering two questions.
+  window.ASCENT_SETTLE = function (ev, fn, ms) { const btn = ev.currentTarget; const grp = btn.closest(".options") || btn.parentElement; if (grp && grp.classList.contains("locked")) return; if (grp) grp.classList.add("locked"); [...(grp ? grp.children : [])].forEach(b => b.setAttribute && b.setAttribute("aria-checked", "false")); btn.setAttribute("aria-checked", "true"); setTimeout(fn, ms || 320); };
   if (!st.profile || !st.capability || !st.communication) st = fresh();
 
   // ---------- dom helpers ----------
@@ -115,7 +117,7 @@
     const el = screen("", topline(pct, `${d.name} · ${i + 1} of ${order.length}`, back));
     el.append(h("p", { class: "prefix" }, "In the past month…"), h("p", { class: "statement" }, o.it.t));
     const opts = h("div", { class: "options", role: "radiogroup" });
-    P.scale.forEach((s, k) => opts.append(h("button", { class: "opt", role: "radio", "aria-checked": String(pr.answers[o.key] === k), onclick: () => { pr.answers[o.key] = k; pr.pos++; save(); render(); } }, h("span", { class: "dot" }), s)));
+    P.scale.forEach((s, k) => opts.append(h("button", { class: "opt", role: "radio", "aria-checked": String(pr.answers[o.key] === k), onclick: ev => window.ASCENT_SETTLE(ev, () => { pr.answers[o.key] = k; pr.pos++; save(); render(); }) }, h("span", { class: "dot" }), s)));
     el.append(opts, h("div", { class: "spacer" }));
     return el;
     function back() { if (pr.pos > 0) { pr.pos--; save(); render(); } else { pr.pos = -1; save(); render(); } }
@@ -125,7 +127,7 @@
     const el = screen("", topline(98, "One more", () => { pr.pos--; save(); render(); }));
     el.append(h("p", { class: "prefix" }, P.safety.prefix), h("p", { class: "statement" }, P.safety.text));
     const opts = h("div", { class: "options", role: "radiogroup" });
-    P.safety.options.forEach((s, k) => opts.append(h("button", { class: "opt", role: "radio", "aria-checked": "false", onclick: () => { pr.safety = k; pr.refer = k === P.safety.yes_index; finish(k === P.safety.yes_index); } }, h("span", { class: "dot" }), s)));
+    P.safety.options.forEach((s, k) => opts.append(h("button", { class: "opt", role: "radio", "aria-checked": "false", onclick: ev => window.ASCENT_SETTLE(ev, () => { pr.safety = k; pr.refer = k === P.safety.yes_index; finish(k === P.safety.yes_index); }) }, h("span", { class: "dot" }), s)));
     el.append(opts, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-link", onclick: () => { pr.safety = null; finish(false); } }, "Prefer not to say")));
     return el;
     function finish(crisis) { pr.scores = scoreProfile(); pr.done = true; pr.doneAt = Date.now(); save(); if (crisis) showCrisis(() => nav("/profile/report")); else nav("/profile/report"); }
@@ -148,9 +150,9 @@
     const lowCount = D.filter(d => pr.scores[d.id] < 40).length;
     if (!pr.refer && lowCount >= 4) el.append(h("div", { class: "callout refer" }, h("h3", {}, "Consider a clinician alongside this"), `${lowCount} of seven capacities read Early. That pattern usually means something is pressing on all of them at once, and training alone tends not to move it. A clinician can help find the thing underneath while you train.`));
     el.append(h("div", { class: "callout accent" }, h("h3", {}, "Where to start"), h("strong", {}, `${weakest.name} (${band(pr.scores[weakest.id]).name}, ${pr.scores[weakest.id]})`), ` is carrying the least. ${weakest.trains}`, byId[weakest.id].status === "live" ? "" : ` Its block is not in the MVP yet; the two that are, Capability and Communication, are good first blocks for almost everyone.`));
-    if (!st.character) el.append(h("div", { class: "callout accent" }, h("h3", {}, "Next: your build"), "Twelve minutes of lives to choose between. The character everything else hangs on.", h("div", { class: "actions row" }, h("a", { class: "btn btn-primary", href: "#/intake" }, "Build your character"))));
     el.append(h("div", { class: "callout" }, h("h3", {}, "Strongest"), `${strongest.name} (${pr.scores[strongest.id]}). ${band(pr.scores[strongest.id]).note}`));
-    el.append(h("div", { class: "spacer" }), h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: byId[weakest.id].status === "live" ? `#/${weakest.id}` : "#/capability" }, `Start ${byId[weakest.id].status === "live" ? weakest.name : "Capability"}`), h("a", { class: "btn", href: "#/" }, "See all seven"), st.testMode ? h("button", { class: "btn btn-link", onclick: () => { st.profile = fresh().profile; save(); nav("/"); } }, "Reset Profile (test)") : null));
+    if (!st.character) el.append(h("div", { class: "spacer" }), h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: "#/intake" }, "Build your character · 12 minutes")));
+    else el.append(h("div", { class: "spacer" }), h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: byId[weakest.id].status === "live" ? `#/${weakest.id}` : "#/capability" }, `Start ${byId[weakest.id].status === "live" ? weakest.name : "Capability"}`), h("a", { class: "btn", href: "#/" }, "See all seven"), st.testMode ? h("button", { class: "btn btn-link", onclick: () => { st.profile = fresh().profile; save(); nav("/"); } }, "Reset Profile (test)") : null));
     return el;
   });
 

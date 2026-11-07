@@ -204,3 +204,8 @@ html.night-grey { filter: grayscale(1) brightness(0.9); }
 .sheet-head { display: flex; gap: 14px; align-items: flex-start; margin-top: 10px; }
 .sheet-mark .mark { width: 64px; height: 64px; font-size: 1.6rem; }
 .greyed { color: var(--t-faint); }
+.options.locked .opt { pointer-events: none; }
+.options .opt[aria-checked="true"] { border-color: var(--em); background: var(--ok-bg); }
+.setup-steps li { margin-bottom: 12px; }
+.setup-steps li.done strong { color: var(--t-faint); }
+.setup-steps li.now strong { color: var(--em); }

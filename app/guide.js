@@ -57,17 +57,30 @@
       const why = { development: !s.profile.done ? "Nothing else counts until the baseline is taken." : !s.character ? "The sheet everything else hangs on. Once." : "Where the rotation lands today.", foundations: "Thirty seconds, every day.", recovery: `For ${(R.triggers.find(x => x.id === trig) || {}).name.toLowerCase()}.` };
       return { say: s.profile.done ? "Here is today. Skip anything that does not fit." : "Start with the Profile; it tells me where to start you.", picks: { development: dev, foundations: fnd, recovery: rec.concat(recRest).slice(0, 3) }, why, source: "rules" };
     }
-    function greeting() { const hour = new Date().getHours(); const t = TD(); const p = t.program(); const s = S(); const part = (hour < 12 ? "Morning" : hour < 17 ? "Afternoon" : "Evening") + (s.character ? ", " + s.character.title.replace(/^The /, "") : ""); if (!s.profile.done) return `${part}. First time here, so the Profile comes first: twelve minutes, once. What kind of day has it been?`; if (p.idx === 1) return `${part}. Tell me the day in a line and I will pick three things. Skip any of them. What kind of day has it been?`; return hour < 12 ? `${part}. What is today shaped like?` : `${part}. What happened today?`; }
+    function greeting() { const hour = new Date().getHours(); const t = TD(); const p = t.program(); const s = S(); const part = (hour < 12 ? "Morning" : hour < 17 ? "Afternoon" : "Evening") + (s.character ? ", " + s.character.title.replace(/^The /, "") : ""); if (p.idx === 1) return `${part}. Tell me the day in a line and I will pick three things. Skip any of them. What kind of day has it been?`; return hour < 12 ? `${part}. What is today shaped like?` : `${part}. What happened today?`; }
     const chipsFor = () => { const hour = new Date().getHours(); return hour < 12 ? [["Nothing special", "Nothing special so far."], ["Big thing today", "Something big today: a pitch, a hard conversation."], ["Just pick", null]] : [["Nothing special", "Nothing in particular. An ordinary day."], ["A hard day", "A hard day. Everything at once."], ["Just pick", null]]; };
 
     // ---------- voice ----------
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     function speak(text) { const g = G(); if (!g.speak || !("speechSynthesis" in window)) return; try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); const voices = speechSynthesis.getVoices(); const pref = voices.find(v => /en[-_](GB|US)/.test(v.lang) && /Daniel|Samantha|Google UK English Male|Google US English|Alex|Karen|Moira/.test(v.name)) || voices.find(v => /^en/.test(v.lang)); if (pref) u.voice = pref; u.rate = 0.95; u.pitch = 0.95; speechSynthesis.speak(u); } catch {} }
 
+    // ---------- setup: the page before the daily flow exists ----------
+    function setup(s, p) {
+      const el = screen("home setup"); const step = !s.profile.done ? 1 : 2;
+      el.append(h("div", { class: "wordmark" }, "Ascent", h("small", {}, "designed by a psychiatrist")));
+      el.append(h("p", { class: "eyebrow" }, "Mental fitness for founders"), h("h1", {}, em("Not your brain. *The parts of it that keep letting you down.*")), h("p", { class: "help" }, "Focus is not a muscle; it is what is left when fear, reward and attention are not hijacking it. Ascent trains those parts the way a gym trains legs: three things a day, picked for you, each a few minutes."));
+      const ol = h("ol", { class: "steps setup-steps" });
+      [["The Profile", "Twelve minutes. Where the seven capacities stand today.", s.profile.done], ["Your build", "Twelve minutes, once. Lives to choose between; a character to play.", !!s.character], ["Three things a day", "Picked for you. Skip any. Seven closed days in your first ten and the app is free for a year.", false]].forEach(([n, l, done], i) => ol.append(h("li", { class: done ? "done" : i + 1 === step ? "now" : "" }, h("strong", {}, n), done ? " ✓" : "", h("div", { class: "fine", style: { marginTop: "2px" } }, l))));
+      el.append(ol, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: step === 1 ? "#/profile" : "#/intake" }, step === 1 ? "Begin · the Profile" : "Next · your build")));
+      el.append(h("p", { class: "fine" }, "Training, not treatment. Nothing you answer leaves this device in the MVP."));
+      return el;
+    }
+
     // ---------- home ----------
     route(/^$/, () => {
       const t = TD(); const s = S(); const day = t.dayKey(); const p = t.program(); const dayState = today(); const g = G();
       if (p.won && !(s.today || {}).founding) { s.today.founding = Date.now(); save(); nav("/founding"); return screen(""); }
+      if (!s.profile.done || !s.character) return setup(s, p);
       const el = screen("home today guide");
       const menu = h("div", { class: "menu-row" }); menu.hidden = true;
       menu.append(h("button", { class: "btn btn-link", onclick: () => { g.speak = !g.speak; save(); if (!g.speak) try { speechSynthesis.cancel(); } catch {} nav("/"); } }, g.speak ? "Voice off" : "Voice on"), h("a", { class: "btn btn-link", href: "#/today" }, "Browse"), h("a", { class: "btn btn-link", href: s.character ? "#/sheet" : "#/profile/report" }, s.character ? "Your build" : "Profile"));
