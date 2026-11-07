@@ -117,12 +117,12 @@ window.ASCENT_INTAKE = {
   order: ["V1", "V2", "A1", "B1", "C1", "D1", "E1", "F1", "A2", "B2", "C2", "V3", "A3", "B3", "C3", "D2", "A4", "B4", "C4", "E2", "A5", "B5", "C5", "V4", "A6", "B6", "C6", "F2", "A7", "B7", "C7", "D3", "A8", "B8", "C8", "V5", "A9", "B9", "C9", "E3", "A10", "B10", "C10", "F3", "A11", "B11", "C11", "D4", "A12", "B12", "C12", "V6", "A13", "B13", "C13", "R1", "A14", "B14", "C14", "E4", "A15", "B15", "C15", "F4", "A16", "D5", "V7", "A17", "D6", "R2", "A18", "E5", "F5", "V8", "A19", "D7", "R3", "A20", "E6", "F6", "V9", "D8", "F7", "R4", "V10", "G1", "G2", "G3", "G4", "G5", "H1", "H2", "H3", "H4"],
   needs: { certainty: "Certainty", uncertainty: "Uncertainty", significance: "Significance", love: "Love", growth: "Growth", contribution: "Contribution" },
   classes: {
-    certainty: { name: "Warden", cost: "Holds on past the point of sense, and calls it prudence.", home: ["detachment", "capability"] },
+    certainty: { name: "Knight", cost: "Holds the line past the point of sense, and calls it duty.", home: ["detachment", "capability"] },
     uncertainty: { name: "Rogue", cost: "Finishes fewer things than it starts, and knows it.", home: ["enjoyment", "capability"] },
-    significance: { name: "Champion", cost: "Proves things to people who stopped watching years ago.", home: ["drive", "communication"] },
+    significance: { name: "Paladin", cost: "Proves things to people who stopped watching years ago.", home: ["drive", "communication"] },
     love: { name: "Bard", cost: "Cannot deliver bad news to anyone it likes, which is everyone.", home: ["connection", "enjoyment"] },
-    growth: { name: "Seeker", cost: "Never arrives, and treats people as curriculum.", home: ["vision", "capability"] },
-    contribution: { name: "Steward", cost: "Disappears into the cause until there is nobody left to run it.", home: ["connection", "detachment"] }
+    growth: { name: "Wizard", cost: "Never arrives, and treats people as curriculum.", home: ["vision", "capability"] },
+    contribution: { name: "Druid", cost: "Disappears into the cause until there is nobody left to tend it.", home: ["connection", "detachment"] }
   },
   styles: {
     explorer: { name: "Daggers", move: "Fast, close, and never bored; many small cuts." },
@@ -131,15 +131,15 @@ window.ASCENT_INTAKE = {
     negotiator: { name: "Bow", move: "Distance and patience; wins through other people, over time." }
   },
   epithets: {
-    certainty: { explorer: "The Quiet Scout", builder: "The Keeper", director: "The Sentinel", negotiator: "The Watchman" },
+    certainty: { explorer: "The Errant", builder: "The Castellan", director: "The Lancer", negotiator: "The Warden" },
     uncertainty: { explorer: "The Cutpurse", builder: "The Sapper", director: "The Raider", negotiator: "The Smuggler" },
-    significance: { explorer: "The Duelist", builder: "The Gladiator", director: "The Lancer", negotiator: "The Marksman" },
+    significance: { explorer: "The Duelist", builder: "The Templar", director: "The Champion", negotiator: "The Standard-bearer" },
     love: { explorer: "The Trickster", builder: "The Innkeeper", director: "The Herald", negotiator: "The Harper" },
-    growth: { explorer: "The Wayfinder", builder: "The Mason", director: "The Pathfinder", negotiator: "The Cartographer" },
-    contribution: { explorer: "The Forager", builder: "The Builder", director: "The Standard-bearer", negotiator: "The Warden of the Gate" }
+    growth: { explorer: "The Alchemist", builder: "The Artificer", director: "The Seer", negotiator: "The Sage" },
+    contribution: { explorer: "The Forager", builder: "The Gardener", director: "The Shepherd", negotiator: "The Grovekeeper" }
   },
   stats: [["O", "Curiosity"], ["C", "Order"], ["E", "Spark"], ["A", "Warmth"], ["S", "Steadiness"]],
-  words: { stance: { vanguard: "Vanguard", steady: "Steady", warden: "Warden" }, horizon: { past: "Behind", present: "Here", future: "Ahead" }, senses: { keen: "Keen", fair: "Fair", dim: "Dim" }, hour: { morning: "Morning", day: "Day", evening: "Evening" } },
+  words: { stance: { vanguard: "Vanguard", steady: "Steady", warden: "Rearguard" }, horizon: { past: "Behind", present: "Here", future: "Ahead" }, senses: { keen: "Keen", fair: "Fair", dim: "Dim" }, hour: { morning: "Morning", day: "Day", evening: "Evening" } },
   // trait signatures: target values (0–100) on the dimensions each class/weapon is made of. Used by the gap algorithm.
   signatures: {
     classes: { certainty: { prev: 70, C: 70, basF: 40 }, uncertainty: { basF: 75, O: 70, prom: 70 }, significance: { basD: 75, E: 65, A: 40 }, love: { A: 75, E: 60 }, growth: { O: 75, future: 70, C: 60 }, contribution: { A: 70, future: 65 } },
