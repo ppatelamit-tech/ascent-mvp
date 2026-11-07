@@ -10,7 +10,7 @@ Voice. Plain, warm, unhurried, specific. Short sentences. At most 45 words per t
 
 Hard rules.
 - You never diagnose, interpret, reassure at length, give advice, or coach. You may acknowledge in one plain clause ("That is a loss, not a failure.") because that is routing, not treatment. You do not explore feelings, ask "how did that make you feel", or offer techniques in the chat. The activities are the treatment; you only select them.
-- Ask at most ONE question per turn, and no more than three questions in the whole exchange. If the person has already said enough, or the message says mustPick, pick now without asking.
+- You get at most ONE question in the whole exchange, and only if what they said gives you nothing to pick on. Usually what they said is enough: pick. If the message says mustPick, pick now without asking. Never ask a second question. Never ask how they feel.
 - When you pick, choose ONLY ids from the catalogue, exactly as written, and give each pillar an ordered list of up to 3 ids (best first; the rest are what you offer if they skip). One line per pillar's first pick saying why it fits what they told you, in "why". Prefer items whose "suits" match the day. Respect the time of day and minutes: late evening → short and calm; before a big thing → the Threshold ritual; a win → Receive it; a loss → Releasing; a rupture → Four lines; nothing in particular → Shut the shop in the evening. Never pick something the summary says is already done today.
 - If the person mentions wanting to die, suicide, self-harm, or not being safe, set "crisis": true and say, plainly, that this is bigger than the app, that they should call or text 988 now (or 911 if in danger), and that the Profile will carry a note. Pick nothing.
 - If the person asks you to chat, vent, or for advice: one warm sentence, then pick. You are the door, not the room.
@@ -28,7 +28,7 @@ exports.handler = async (event) => {
   if (JSON.stringify(body).length > 60000) return { statusCode: 413, body: "too long" };
   const key = process.env.ANTHROPIC_API_KEY; if (!key) return { statusCode: 503, body: JSON.stringify({ error: "no_key" }) };
   const ids = new Set(catalogue.map(c => c.id));
-  const context = `Context (not from the person):\nLocal time: ${summary.time || "unknown"}. ${summary.line || ""}\nAlready done today: ${summary.done || "nothing"}.\n${mustPick ? "mustPick: you must pick now, no question." : `Questions asked so far: ${summary.questions || 0} of 3.`}\n\nCatalogue (pick only these ids):\n${catalogue.map(c => `- ${c.id} [${c.pillar}, ${c.minutes} min] ${c.title}${c.suits ? " — suits: " + c.suits : ""}`).join("\n")}`;
+  const context = `Context (not from the person):\nLocal time: ${summary.time || "unknown"}. ${summary.line || ""}\nAlready done today: ${summary.done || "nothing"}.\n${mustPick ? "mustPick: you must pick now, no question." : `Questions asked so far: ${summary.questions || 0} of 1.`}\n\nCatalogue (pick only these ids):\n${catalogue.map(c => `- ${c.id} [${c.pillar}, ${c.minutes} min] ${c.title}${c.suits ? " — suits: " + c.suits : ""}`).join("\n")}`;
   const convo = messages.slice(-12).map(m => ({ role: m.role === "user" ? "user" : "assistant", content: m.text }));
   if (!convo.length || convo[0].role !== "user") convo.unshift({ role: "user", content: "(opens the app)" });
   // merge consecutive same-role turns

@@ -13,7 +13,7 @@
     const G = () => { const s = S(); s.guide = s.guide || { days: {}, speak: true }; return s.guide; };
     const today = () => { const g = G(); const k = TD().dayKey(); g.days[k] = g.days[k] || { msgs: [], picks: null, why: null, skipped: [], questions: 0 }; return g.days[k]; };
     const CRISIS = /\b(suicid|kill myself|end my life|want to die|don'?t want to (be alive|live|be here)|self[- ]harm|hurt myself|not safe)\b/i;
-    const MAX_Q = 3;
+    const MAX_Q = 1; // one question at most: greeting, maybe one question, then the picks
 
     // ---------- catalogue: what the Guide can pick from, given the state ----------
     function catalogue() {
@@ -56,8 +56,8 @@
       const why = { development: s.profile.done ? "Where the rotation lands today." : "Nothing else counts until the baseline is taken.", foundations: "Thirty seconds, every day.", recovery: `For ${(R.triggers.find(x => x.id === trig) || {}).name.toLowerCase()}.` };
       return { say: s.profile.done ? "Here is today. Skip anything that does not fit." : "Start with the Profile; it tells me where to start you.", picks: { development: dev, foundations: fnd, recovery: rec.concat(recRest).slice(0, 3) }, why, source: "rules" };
     }
-    function greeting() { const hour = new Date().getHours(); const t = TD(); const p = t.program(); const s = S(); const part = hour < 12 ? "Morning" : hour < 17 ? "Afternoon" : "Evening"; if (!s.profile.done) return `${part}. First time here, so one thing before anything: the Profile, twelve minutes. After that I will ask about your day and pick three things. What kind of day has it been?`; if (p.idx === 1) return `${part}. I will ask one or two things, then pick three for today. You can skip any of them. What kind of day has it been?`; return hour < 12 ? `${part}. What is today shaped like?` : `${part}. What happened today?`; }
-    const chipsFor = () => { const hour = new Date().getHours(); return hour < 12 ? [["Nothing special", "Nothing special so far."], ["Big thing today", "Something big today: a pitch, a hard conversation."], ["Slept badly", "I slept badly and I am behind already."], ["Feeling good", "Feeling good this morning."]] : [["Nothing special", "Nothing in particular. An ordinary day."], ["A hard day", "A hard day. Everything at once."], ["A win", "Something went right today."], ["A loss", "I lost something today: a person, a deal, a hire."], ["A fight", "A fight, or a rupture with someone."], ["I messed up", "I made a mistake and I am still carrying it."]]; };
+    function greeting() { const hour = new Date().getHours(); const t = TD(); const p = t.program(); const s = S(); const part = hour < 12 ? "Morning" : hour < 17 ? "Afternoon" : "Evening"; if (!s.profile.done) return `${part}. First time here, so the Profile comes first: twelve minutes, once. What kind of day has it been?`; if (p.idx === 1) return `${part}. Tell me the day in a line and I will pick three things. Skip any of them. What kind of day has it been?`; return hour < 12 ? `${part}. What is today shaped like?` : `${part}. What happened today?`; }
+    const chipsFor = () => { const hour = new Date().getHours(); return hour < 12 ? [["Nothing special", "Nothing special so far."], ["Big thing today", "Something big today: a pitch, a hard conversation."], ["Just pick", null]] : [["Nothing special", "Nothing in particular. An ordinary day."], ["A hard day", "A hard day. Everything at once."], ["Just pick", null]]; };
 
     // ---------- voice ----------
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -68,7 +68,9 @@
       const t = TD(); const s = S(); const day = t.dayKey(); const p = t.program(); const dayState = today(); const g = G();
       if (p.won && !(s.today || {}).founding) { s.today.founding = Date.now(); save(); nav("/founding"); return screen(""); }
       const el = screen("home today guide");
-      el.append(h("div", { class: "wordmark" }, "Ascent", h("small", {}, "designed by a psychiatrist")));
+      const menu = h("div", { class: "menu-row" }); menu.hidden = true;
+      menu.append(h("button", { class: "btn btn-link", onclick: () => { g.speak = !g.speak; save(); if (!g.speak) try { speechSynthesis.cancel(); } catch {} nav("/"); } }, g.speak ? "Voice off" : "Voice on"), h("a", { class: "btn btn-link", href: "#/today" }, "Browse"), h("a", { class: "btn btn-link", href: "#/profile/report" }, "Profile"));
+      el.append(h("div", { class: "wordmark" }, "Ascent", h("button", { class: "more", "aria-label": "More", onclick: () => { menu.hidden = !menu.hidden; } }, "···")), menu);
       const dev = t.devDone(day), fnd = t.foundDone(day), rec = t.recDone(day); const closed = dev && fnd && rec;
       const dots = []; for (let i = 0; i < t.GOAL; i++) dots.push(h("span", { class: i < p.closed ? "on" : "" }));
       el.append(h("div", { class: "seven-ring" }, h("div", { class: "dots" }, ...dots), h("div", { class: "r-label" }, p.won ? "Seven days. The app is yours." : p.over ? `${p.closed} of ${t.GOAL} in your ten days` : `Day ${p.idx} of ${t.WINDOW} · ${p.closed} of ${t.GOAL} closed`)));
@@ -79,25 +81,24 @@
       function drawChat() { chat.innerHTML = ""; dayState.msgs.forEach(m => chat.append(bubble(m))); if (busy) chat.append(h("div", { class: "bubble guide thinking" }, "…")); }
       function drawPicks() {
         picksBox.innerHTML = "";
-        if (closed) { picksBox.append(h("div", { class: "pillar done" }, h("div", { class: "p-head" }, h("span", { class: "p-label" }, "Today"), h("span", { class: "p-sub" }, "all three"), h("span", { class: "p-check" }, "✓")), h("div", { class: "p-body" }, h("div", {}, h("div", { class: "p-title" }, "Today is closed"), h("div", { class: "p-line" }, "Development, Foundations, Recovery. Nothing else is asked of you."))))); return; }
+        if (closed) { picksBox.append(h("div", { class: "pillar done" }, h("div", { class: "p-head" }, h("span", { class: "p-label" }, "Today"), h("span", { class: "p-check" }, "✓")), h("div", { class: "p-body" }, h("div", {}, h("div", { class: "p-title" }, "Today is closed"), h("div", { class: "p-line" }, "All three. Nothing else is asked of you."))))); return; }
         if (!dayState.picks) return;
-        [["development", "Development", "like working out", dev], ["foundations", "Foundations", "like nutrition", fnd], ["recovery", "Recovery", "like recovery", rec]].forEach(([k, label, sub, doneVal]) => {
-          const list = (dayState.picks[k] || []).filter(id => !dayState.skipped.includes(id)); const item = list.map(findItem).find(Boolean);
-          if (doneVal) { picksBox.append(h("div", { class: "pillar done" }, h("div", { class: "p-head" }, h("span", { class: "p-label" }, label), h("span", { class: "p-sub" }, sub), h("span", { class: "p-check" }, "✓")), h("div", { class: "p-body" }, h("div", {}, h("div", { class: "p-title" }, `Done · ${typeof doneVal === "string" ? doneVal : k === "recovery" ? t.ritualName(doneVal.id) : "check-in"}`))))); return; }
-          if (!item) { picksBox.append(h("a", { class: "pillar", href: k === "development" ? "#/seven" : "#/" + k }, h("div", { class: "p-head" }, h("span", { class: "p-label" }, label), h("span", { class: "p-sub" }, sub)), h("div", { class: "p-body" }, h("div", {}, h("div", { class: "p-title" }, "Nothing left to offer"), h("div", { class: "p-line" }, "Browse and pick your own."))))); return; }
-          const first = (dayState.picks[k] || [])[0] === item.id; const why = dayState.why && dayState.why[k] && first ? dayState.why[k] : "";
-          picksBox.append(h("div", { class: "pillar pick" }, h("div", { class: "p-head" }, h("span", { class: "p-label" }, label), h("span", { class: "p-sub" }, sub)), h("div", { class: "p-body" }, item.d ? mark(item.d) : null, h("div", { style: { flex: 1 } }, h("div", { class: "p-title" }, item.title.replace(/\s*\(.*\)$/, "")), h("div", { class: "p-line" }, `${item.minutes} min.${why ? " " + why : first ? "" : " The next one on the list."}`))), h("div", { class: "actions row", style: { marginTop: "10px" } }, h("a", { class: "btn btn-primary", href: item.href }, "Do it"), h("button", { class: "btn btn-link", onclick: () => { dayState.skipped.push(item.id); if (!list.slice(1).length) { const more = catalogue().filter(c => c.pillar === k && !dayState.skipped.includes(c.id) && !(dayState.picks[k] || []).includes(c.id)).slice(0, 2).map(c => c.id); dayState.picks[k] = (dayState.picks[k] || []).concat(more); } save(); drawPicks(); } }, "Skip"))));
-        });
+        const order = [["development", "Development", dev], ["foundations", "Foundations", fnd], ["recovery", "Recovery", rec]];
+        const doneN = order.filter(o => o[2]).length; const next = order.find(o => !o[2]); if (!next) return;
+        const [k, label] = next; const list = (dayState.picks[k] || []).filter(id => !dayState.skipped.includes(id)); const item = list.map(findItem).find(Boolean);
+        if (!item) { picksBox.append(h("a", { class: "pillar", href: k === "development" ? "#/seven" : "#/" + k }, h("div", { class: "p-head" }, h("span", { class: "p-label" }, label), h("span", { class: "p-sub" }, `${doneN + 1} of 3`)), h("div", { class: "p-body" }, h("div", {}, h("div", { class: "p-title" }, "Pick your own"), h("div", { class: "p-line" }, "Nothing left on today's list for this one."))))); return; }
+        const first = (dayState.picks[k] || [])[0] === item.id; const why = dayState.why && dayState.why[k] && first ? dayState.why[k] : "";
+        picksBox.append(h("div", { class: "pillar pick" }, h("div", { class: "p-head" }, h("span", { class: "p-label" }, label), h("span", { class: "p-sub" }, `${doneN + 1} of 3`)), h("div", { class: "p-body" }, item.d ? mark(item.d) : null, h("div", { style: { flex: 1 } }, h("div", { class: "p-title" }, item.title.replace(/\s*\(.*\)$/, "")), h("div", { class: "p-line" }, `${item.minutes} min.${why ? " " + why : ""}`))), h("div", { class: "actions row", style: { marginTop: "10px" } }, h("a", { class: "btn btn-primary", href: item.href }, "Do it"), h("button", { class: "btn btn-link", onclick: () => { dayState.skipped.push(item.id); if (!list.slice(1).length) { const more = catalogue().filter(c => c.pillar === k && !dayState.skipped.includes(c.id) && !(dayState.picks[k] || []).includes(c.id)).slice(0, 2).map(c => c.id); dayState.picks[k] = (dayState.picks[k] || []).concat(more); } save(); drawPicks(); } }, "Skip"))));
       }
       function drawInput() {
         inputRow.innerHTML = "";
-        if (closed) { inputRow.append(h("div", { class: "actions row" }, h("a", { class: "btn btn-link", href: "#/today" }, "Browse"), h("a", { class: "btn btn-link", href: "#/seven" }, "The seven"))); return; }
-        if (!dayState.picks) { const cs = h("div", { class: "chips" }); chipsFor().forEach(([l, text]) => cs.append(h("button", { class: "chip", onclick: () => send(text) }, l))); inputRow.append(cs); }
-        const inp = h("input", { type: "text", placeholder: dayState.picks ? "Anything else? Or just go." : (SR ? "Say it, or type it" : "Type it"), maxlength: 600, onkeydown: e => { if (e.key === "Enter" && inp.value.trim()) { send(inp.value.trim()); inp.value = ""; } } });
+        if (closed || dayState.picks) return;
+        const cs = h("div", { class: "chips" }); chipsFor().forEach(([l, text]) => cs.append(h("button", { class: "chip", onclick: () => text ? send(text) : applyResult(fallbackPicks(dayState.msgs.filter(m => m.role === "user").map(m => m.text).join(" "))) }, l))); inputRow.append(cs);
+        const inp = h("input", { type: "text", placeholder: SR ? "Or say it" : "Or type it", maxlength: 600, onkeydown: e => { if (e.key === "Enter" && inp.value.trim()) { send(inp.value.trim()); inp.value = ""; } } });
         const mic = SR ? h("button", { class: "mic", "aria-label": "Speak", onclick: () => toggleMic(mic, inp) }, "●") : null;
-        const sendBtn = h("button", { class: "btn btn-primary", style: { minHeight: "44px", padding: "0 16px" }, onclick: () => { if (inp.value.trim()) { send(inp.value.trim()); inp.value = ""; } } }, "Send");
+        const sendBtn = h("button", { class: "btn btn-primary send", onclick: () => { if (inp.value.trim()) { send(inp.value.trim()); inp.value = ""; } } }, "→"); sendBtn.hidden = true;
+        inp.addEventListener("input", () => { sendBtn.hidden = !inp.value.trim(); });
         inputRow.append(h("div", { class: "chat-row" }, mic, inp, sendBtn));
-        inputRow.append(h("div", { class: "actions row", style: { marginTop: "8px" } }, h("button", { class: "btn btn-link", onclick: () => { g.speak = !g.speak; save(); if (!g.speak) try { speechSynthesis.cancel(); } catch {} drawInput(); } }, g.speak ? "Voice on" : "Voice off"), dayState.picks ? null : h("button", { class: "btn btn-link", onclick: () => applyResult(fallbackPicks(dayState.msgs.filter(m => m.role === "user").map(m => m.text).join(" "))) }, "Just pick for me"), h("a", { class: "btn btn-link", href: "#/today" }, "Browse")));
       }
       function toggleMic(btn, inp) {
         if (rec_) { try { rec_.stop(); } catch {} rec_ = null; btn.classList.remove("live"); return; }

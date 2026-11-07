@@ -198,3 +198,6 @@ html.night-grey { filter: grayscale(1) brightness(0.9); }
 .mic { width: 44px; height: 44px; border-radius: 22px; border: 1.5px solid var(--hairline); background: var(--panel); color: var(--crisis); font-size: 0.9rem; cursor: pointer; flex: none; }
 .mic.live { background: var(--crisis); color: #fff; border-color: var(--crisis); animation: pulse 1.1s infinite; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(143,47,59,0.35); } 100% { box-shadow: 0 0 0 12px rgba(143,47,59,0); } }
+.wordmark .more { background: none; border: none; color: var(--t-faint); font-size: 1.2rem; letter-spacing: 0.1em; cursor: pointer; padding: 0 4px; }
+.menu-row { display: flex; gap: 4px; justify-content: flex-end; margin-top: 4px; }
+.chat-row .send { min-height: 44px; width: 44px; padding: 0; border-radius: 22px; font-size: 1.2rem; }
