@@ -201,3 +201,6 @@ html.night-grey { filter: grayscale(1) brightness(0.9); }
 .wordmark .more { background: none; border: none; color: var(--t-faint); font-size: 1.2rem; letter-spacing: 0.1em; cursor: pointer; padding: 0 4px; }
 .menu-row { display: flex; gap: 4px; justify-content: flex-end; margin-top: 4px; }
 .chat-row .send { min-height: 44px; width: 44px; padding: 0; border-radius: 22px; font-size: 1.2rem; }
+.sheet-head { display: flex; gap: 14px; align-items: flex-start; margin-top: 10px; }
+.sheet-mark .mark { width: 64px; height: 64px; font-size: 1.6rem; }
+.greyed { color: var(--t-faint); }

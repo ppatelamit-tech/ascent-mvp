@@ -23,6 +23,7 @@
       if ((s.capability.completions || []).some(k => dayKey(k.at) === day)) return "Capability";
       if ((s.communication.sets || []).some(k => dayKey(k.at) === day)) return "Communication";
       if (((s.enjoyment || {}).sessions || []).some(k => dayKey(k.at) === day)) return "Enjoyment";
+      if (s.intake && s.intake.doneAt && dayKey(s.intake.doneAt) === day) return "Your build";
       for (const [key, name] of [["drive", "Drive"], ["connection", "Connection"], ["vision", "Vision"], ["detachment", "Detachment"]]) if (((s[key] || {}).log || []).some(k => dayKey(k.at) === day)) return name;
       return null;
     }
