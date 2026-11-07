@@ -31,3 +31,29 @@ General-wellness product. No diagnosis anywhere. Clinical screeners never shown 
 ## Not yet
 
 Stripe authorize-and-release, accounts, lesson video, re-measurement at block end, wearable import, illustrated marks.
+
+## Accounts and profile storage (optional)
+
+The app is fully usable with no account: everything lives in the browser. Accounts add cross-device sync and durable storage of the backend profile. They run on Supabase (magic-link email auth + one Postgres row per user holding the whole state as JSON, protected by row-level security).
+
+Setup, once:
+
+1. Create a Supabase project. In **Authentication → Providers → Email**, leave Email on and enable magic links (default). Add the site URL (`https://ascent-mvp.netlify.app/app/`) under **Authentication → URL configuration → Redirect URLs**.
+2. In the SQL editor, run:
+
+```sql
+create table if not exists public.ascent_state (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  state jsonb not null,
+  updated_at timestamptz not null default now()
+);
+alter table public.ascent_state enable row level security;
+create policy "own row: select" on public.ascent_state for select using (auth.uid() = user_id);
+create policy "own row: insert" on public.ascent_state for insert with check (auth.uid() = user_id);
+create policy "own row: update" on public.ascent_state for update using (auth.uid() = user_id);
+create policy "own row: delete" on public.ascent_state for delete using (auth.uid() = user_id);
+```
+
+3. Put the project URL and the **anon** key (public by design) into `app/config.js`. Deploy.
+
+Behaviour: signing in pulls whichever of local/remote is newer by `updated`, then every save pushes after 1.5 s. Delete removes the row and signs out; "Clear this device" wipes the local copy. The free Supabase tier sends about four magic-link emails an hour from its own SMTP; for launch, set custom SMTP under **Authentication → SMTP settings** (Resend or Postmark work).

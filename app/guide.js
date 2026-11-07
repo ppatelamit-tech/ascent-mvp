@@ -72,7 +72,7 @@
       const ol = h("ol", { class: "steps setup-steps" });
       [["The Profile", "Twelve minutes. Where the seven capacities stand today.", s.profile.done], ["Your build", "Twelve minutes, once. Lives to choose between; a character to play.", !!s.character], ["Three things a day", "Picked for you. Skip any. Seven closed days in your first ten and the app is free for a year.", false]].forEach(([n, l, done], i) => ol.append(h("li", { class: done ? "done" : i + 1 === step ? "now" : "" }, h("strong", {}, n), done ? " ✓" : "", h("div", { class: "fine", style: { marginTop: "2px" } }, l))));
       el.append(ol, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: step === 1 ? "#/profile" : "#/intake" }, step === 1 ? "Begin · the Profile" : "Next · your build")));
-      el.append(h("p", { class: "fine" }, "Training, not treatment. Nothing you answer leaves this device in the MVP."));
+      el.append(h("p", { class: "fine" }, "Training, not treatment. Nothing you answer leaves this device unless you ", h("a", { href: "#/account" }, "sign in"), " to keep it across devices."));
       return el;
     }
 
@@ -83,7 +83,7 @@
       if (!s.profile.done || !s.character) return setup(s, p);
       const el = screen("home today guide");
       const menu = h("div", { class: "menu-row" }); menu.hidden = true;
-      menu.append(h("button", { class: "btn btn-link", onclick: () => { g.speak = !g.speak; save(); if (!g.speak) try { speechSynthesis.cancel(); } catch {} nav("/"); } }, g.speak ? "Voice off" : "Voice on"), h("a", { class: "btn btn-link", href: "#/today" }, "Browse"), h("a", { class: "btn btn-link", href: s.character ? "#/sheet" : "#/profile/report" }, s.character ? "Your build" : "Profile"));
+      menu.append(h("button", { class: "btn btn-link", onclick: () => { g.speak = !g.speak; save(); if (!g.speak) try { speechSynthesis.cancel(); } catch {} nav("/"); } }, g.speak ? "Voice off" : "Voice on"), h("a", { class: "btn btn-link", href: "#/today" }, "Browse"), h("a", { class: "btn btn-link", href: s.character ? "#/sheet" : "#/profile/report" }, s.character ? "Your build" : "Profile"), h("a", { class: "btn btn-link", href: "#/account" }, "Account"));
       el.append(h("div", { class: "wordmark" }, "Ascent", h("button", { class: "more", "aria-label": "More", onclick: () => { menu.hidden = !menu.hidden; } }, "···")), menu);
       const dev = t.devDone(day), fnd = t.foundDone(day), rec = t.recDone(day); const closed = dev && fnd && rec;
       const dots = []; for (let i = 0; i < t.GOAL; i++) dots.push(h("span", { class: i < p.closed ? "on" : "" }));

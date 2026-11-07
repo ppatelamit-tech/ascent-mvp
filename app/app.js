@@ -11,7 +11,8 @@
   // ---------- state ----------
   function fresh() { return { v: 1, started: Date.now(), profile: { answers: {}, pos: -1, safety: null, done: false, scores: null, refer: false }, capability: { blockStart: null, completions: [], readiness: [] }, communication: { sets: [] }, testMode: location.search.includes("test") }; }
   function load() { try { const s = localStorage.getItem(KEY); return s ? JSON.parse(s) : null; } catch { return null; } }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch {} }
+  function save(quiet) { st.updated = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(st)); } catch {} if (!quiet) try { window.dispatchEvent(new CustomEvent("ascent:save")); } catch {} }
+  function replaceState(obj) { st = obj; save(true); render(); }
   let st = load() || fresh();
   // Select, then Next. A tap marks the choice and reveals one Next button; nothing advances until Next is tapped.
   window.ASCENT_SETTLE = function (ev, fn) { const btn = ev.currentTarget; const grp = btn.closest(".options") || btn.parentElement; [...grp.children].forEach(b => b.setAttribute && b.setAttribute("aria-checked", "false")); btn.setAttribute("aria-checked", "true"); grp._next = fn; let row = grp.nextElementSibling; if (!row || !row.classList.contains("next-row")) { row = h("div", { class: "actions next-row" }, h("button", { class: "btn btn-primary", onclick: () => { if (grp._next) { const f = grp._next; grp._next = null; f(); } } }, "Next")); grp.after(row); } };
@@ -344,7 +345,7 @@
   });
 
   // ---------- plugins ----------
-  (window.ASCENT_PLUGINS || []).forEach(p => { try { p({ route, h, em, screen, topline, nav, mark, byId, slider, fmtDate, state: () => st, save }); } catch (e) { console.error(e); } });
+  (window.ASCENT_PLUGINS || []).forEach(p => { try { p({ route, h, em, screen, topline, nav, mark, byId, slider, fmtDate, state: () => st, save, replaceState }); } catch (e) { console.error(e); } });
 
   // ---------- boot ----------
   const tb = document.getElementById("testbar"); if (tb) { tb.hidden = !st.testMode; const r = document.getElementById("reset"); if (r) r.onclick = () => { st = fresh(); st.testMode = true; save(); nav("/"); render(); }; }
