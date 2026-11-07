@@ -2,5 +2,5 @@
    Leave both empty and the app stays local-only: everything lives in this browser. */
 window.ASCENT_CONFIG = {
   supabaseUrl: "https://ghdmzjsokixorqcwnfrm.supabase.co",
-  supabaseAnonKey: ""
+  supabaseAnonKey: "sb_publishable_5udQo5toCZrHSy7Ugen76g_AVKKWYC5"
 };

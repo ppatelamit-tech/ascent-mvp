@@ -54,6 +54,6 @@ create policy "own row: update" on public.ascent_state for update using (auth.ui
 create policy "own row: delete" on public.ascent_state for delete using (auth.uid() = user_id);
 ```
 
-3. Put the project URL and the **anon** key (public by design) into `app/config.js`. Deploy.
+3. Put the project URL and the publishable key (public by design) into `app/config.js`. Deploy.
 
 Behaviour: signing in pulls whichever of local/remote is newer by `updated`, then every save pushes after 1.5 s. Delete removes the row and signs out; "Clear this device" wipes the local copy. The free Supabase tier sends about four magic-link emails an hour from its own SMTP; for launch, set custom SMTP under **Authentication → SMTP settings** (Resend or Postmark work).
