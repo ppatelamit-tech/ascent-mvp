@@ -48,7 +48,7 @@
   function route(re, fn) { routes.push([re, fn]); }
   function render() {
     const hash = location.hash.replace(/^#\/?/, "") || "";
-    if (/^(access_token|error|error_description|type)=/.test(hash) || /[&#]access_token=/.test(location.hash)) { app.innerHTML = ""; app.append(screen("", h("p", { class: "eyebrow" }, "Account"), h("h1", {}, "Signing you in…"), h("p", { class: "help" }, "One moment. If this does not move on its own, the link may have expired: ask for a new one."), h("div", { class: "actions" }, h("a", { class: "btn btn-link", href: "#/account" }, "Account")))); return; }
+    if (/^(access_token|error|error_description|type|refresh_token|expires_in)=/.test(hash) || /[&#?]access_token=/.test(location.href) || /[?&]code=/.test(location.search)) { app.innerHTML = ""; app.append(screen("", h("p", { class: "eyebrow" }, "Account"), h("h1", {}, "Signing you in…"), h("p", { class: "help" }, "One moment. If this does not move on its own, the link may have expired: ask for a new one."), h("div", { class: "actions" }, h("a", { class: "btn btn-link", href: "#/account" }, "Account")))); return; }
     for (const [re, fn] of routes) { const m = hash.match(re); if (m) { app.innerHTML = ""; try { app.append(fn(...m.slice(1))); } catch (e) { app.append(screen("", h("h1", {}, "Something went wrong"), h("p", { class: "help" }, String(e)), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => nav("/") }, "Home")))); console.error(e); } window.scrollTo(0, 0); return; } }
     nav("/");
   }

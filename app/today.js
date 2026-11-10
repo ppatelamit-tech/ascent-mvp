@@ -9,7 +9,7 @@
     const F = window.ASCENT_FOUNDATIONS, R = window.ASCENT_RECOVERY, D = window.ASCENT_DOMAINS, E = window.ASCENT_ENJOYMENT;
     const WINDOW = 10, GOAL = 7;
     const S = () => api.state();
-    const T = () => { const s = S(); s.today = s.today || { start: null, checkins: {}, ritualLog: [], rituals: [], add: null, limit: null, custom: null, weekSet: null, dark: { mode: "red", from: 20, to: 6 }, screenTime: {}, screens: {}, founding: null }; return s.today; };
+    const T = () => { const s = S(); s.today = s.today || { start: null, checkins: {}, ritualLog: [], rituals: [], add: null, limit: null, custom: null, weekSet: null, dark: { mode: "calm", from: 20, to: 6 }, screenTime: {}, screens: {}, founding: null }; return s.today; };
     const save = api.save;
 
     // ---------- days ----------
@@ -65,7 +65,7 @@
     const lc = s => s ? s[0].toLowerCase() + s.slice(1) : "";
 
     // ---------- dull after dark ----------
-    function applyDark() { const t = T(); const dk = t.dark || { mode: "off" }; const hr = new Date().getHours(); const on = dk.mode !== "off" && (hr >= dk.from || hr < dk.to); document.documentElement.classList.toggle("night-red", on && dk.mode === "red"); document.documentElement.classList.toggle("night-grey", on && dk.mode === "grey"); }
+    function applyDark() { const t = T(); const dk = t.dark || { mode: "off" }; const hr = new Date().getHours(); if (dk.mode === "red") dk.mode = "calm"; const on = dk.mode === "always" || (dk.mode !== "off" && (hr >= dk.from || hr < dk.to)); document.documentElement.classList.toggle("night", on && (dk.mode === "calm" || dk.mode === "always")); document.documentElement.classList.toggle("night-grey", on && dk.mode === "grey"); }
     applyDark(); setInterval(applyDark, 60000);
 
     // ---------- shared bits ----------
@@ -101,7 +101,7 @@
 
     route(/^founding$/, () => {
       const el = screen("interlude", topline(100, "Founding member", () => nav("/")));
-      el.append(h("p", { class: "eyebrow" }, "Seven of ten"), h("h1", {}, em("You showed up. *The app is yours.*")), h("p", { class: "body" }, "Seven closed days in your first ten. Ascent is free for your first year, and when subscriptions arrive your founder's rate is locked in. Nothing to claim; it is already recorded here."), h("p", { class: "body" }, "What happens now is the same thing that happened this week, for longer. The seven get deeper. Foundations gets quieter as it becomes habit. Recovery is there on the days that need it."), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => nav("/") }, "Back to today")));
+      el.append(h("p", { class: "eyebrow" }, "Seven of ten"), h("h1", {}, em("You showed up. *The app is yours.*")), h("p", { class: "body" }, "Seven closed days in your first ten. Ascent is free, and you are a founding member: if it ever costs anything, it will not cost you. Nothing to claim; it is already recorded here."), h("p", { class: "body" }, "What happens now is the same thing that happened this week, for longer. The seven get deeper. Foundations gets quieter as it becomes habit. Recovery is there on the days that need it."), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => nav("/") }, "Back to today")));
       return el;
     });
 
@@ -120,7 +120,7 @@
       const stIn = h("input", { type: "text", inputmode: "decimal", placeholder: "hours per day, from your phone's Screen Time", value: t.screenTime[wk] || "" });
       el.append(h("h2", {}, "Screen time"), h("p", { class: "help" }, "Once a week, type the daily average your phone reports. The trend is the point, not the number."), stIn, h("div", { class: "actions row" }, h("button", { class: "btn", onclick: () => { const v = parseFloat(stIn.value); if (!isNaN(v)) { t.screenTime[wk] = v; save(); nav("/foundations"); } } }, "Save this week")));
       const weeks = Object.keys(t.screenTime).sort().slice(-8); if (weeks.length) el.append(h("div", { class: "trend" }, ...weeks.map(w => h("span", { style: { height: Math.min(100, t.screenTime[w] / 10 * 100) + "%" }, title: `${w}: ${t.screenTime[w]} h` }))));
-      el.append(h("div", { class: "actions" }, h("a", { class: "btn", href: "#/foundations/dark" }, `${F.dark.name} · ${t.dark.mode === "off" ? "off" : t.dark.mode + " from " + t.dark.from + ":00"}`), h("a", { class: "btn btn-link", href: "#/foundations/screens" }, t.screens.done ? "A few honest questions · answered" : "A few honest questions")));
+      el.append(h("div", { class: "actions" }, h("a", { class: "btn", href: "#/foundations/dark" }, `${F.dark.name} · ${t.dark.mode === "off" ? "off" : t.dark.mode === "always" ? "always" : t.dark.mode + " from " + t.dark.from + ":00"}`), h("a", { class: "btn btn-link", href: "#/foundations/screens" }, t.screens.done ? "A few honest questions · answered" : "A few honest questions")));
       return el;
     });
 
@@ -163,7 +163,7 @@
       el.append(h("p", { class: "eyebrow" }, "Foundations · the phone"), h("h1", {}, em("Make the phone *boring* after dark")), h("p", { class: "help" }, F.dark.why));
       el.append(h("h2", {}, "In Ascent"));
       const modes = h("div", { class: "chips" });
-      [["red", "Red cast"], ["grey", "Grey"], ["off", "Off"]].forEach(([v, l]) => modes.append(h("button", { class: "chip", role: "radio", "aria-checked": String(t.dark.mode === v), onclick: () => { t.dark.mode = v; save(); applyDark(); nav("/foundations/dark"); } }, l)));
+      [["calm", "Calm dark, after dark"], ["always", "Calm dark, always"], ["grey", "Grey, after dark"], ["off", "Off"]].forEach(([v, l]) => modes.append(h("button", { class: "chip", role: "radio", "aria-checked": String(t.dark.mode === v), onclick: () => { t.dark.mode = v; save(); applyDark(); nav("/foundations/dark"); } }, l)));
       const from = h("select", {}, ...[18, 19, 20, 21, 22].map(x => { const o = h("option", { value: x }, `from ${x}:00`); if (x === t.dark.from) o.selected = true; return o; }));
       from.onchange = () => { t.dark.from = Number(from.value); save(); applyDark(); };
       el.append(modes, from);

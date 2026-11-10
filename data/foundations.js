@@ -37,7 +37,7 @@ window.ASCENT_FOUNDATIONS = {
   // ---------- Dull after dark ----------
   dark: {
     name: "Dull after dark",
-    why: "The better-replicated effect is not blue light. It is boredom: a grey or red screen is simply less interesting, and the pull drops. Ascent shifts to a red cast after dark too, so the app is on your side.",
+    why: "The better-replicated effect is not blue light. It is boredom: a grey or red screen is simply less interesting, and the pull drops. Ascent shifts to a calm dark palette after dark too, so the app is on your side.",
     ios: ["Settings → Accessibility → Display & Text Size → Color Filters. Turn on, choose Grayscale, or Color Tint with the red slider up.", "Settings → Accessibility → Accessibility Shortcut → tick Color Filters. Now triple-clicking the side button toggles it.", "Shortcuts app → Automation → Time of Day → sunset → add the action Set Color Filters → On. Make a second one for sunrise → Off."],
     android: ["Settings → Digital Wellbeing → Bedtime mode → set the schedule → turn on Grayscale.", "Or Settings → Accessibility → Color correction → Grayscale, and add it to the Quick Settings tiles.", "Some phones hide it under Display → Eye comfort shield or Night Light; red tint is there."]
   },

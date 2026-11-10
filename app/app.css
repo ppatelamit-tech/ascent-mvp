@@ -180,7 +180,15 @@ label.lbl { display: block; font-size: 0.82rem; font-weight: 600; color: var(--t
 .chip[aria-checked="true"] { border-color: var(--accent); }
 
 /* ----- Dull after dark: Ascent takes the same medicine ----- */
-html.night-red { filter: sepia(0.7) hue-rotate(-25deg) saturate(1.5) brightness(0.86); }
+/* Night: a calm, low-stimulation dark palette (deep indigo, silver text, pastel lavender / rose / ice accents). Replaces the old red filter. */
+html.night { --canvas: #0E1017; --raised: #141726; --panel: #191C2C; --hairline: #272B3E; --t-strong: #ECEAF4; --t-body: #B7B4CA; --t-faint: #7E7C95; --accent: #B9A6F0; --em: #E1A9D3; --accent-2: #9CD4EE; --warn-bg: #2A2740; --ok-bg: #1A1E30; --crisis: #E08AA0; color-scheme: dark; }
+html.night body { background: var(--canvas); }
+html.night .crisis-strip { background: #141726; }
+html.night .bubble.me { background: #1E2236; border-color: #2E3350; }
+html.night .options .opt[aria-checked="true"] { background: #232842; }
+html.night .btn-primary { background: var(--accent); color: #0E1017; border-color: var(--accent); }
+html.night .pillar.done, html.night .card.done { opacity: 0.75; }
+html.night img, html.night .mark { filter: saturate(0.85); }
 html.night-grey { filter: grayscale(1) brightness(0.9); }
 
 /* ---------- the Guide (chat-first home) ---------- */
