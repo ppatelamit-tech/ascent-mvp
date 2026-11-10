@@ -88,23 +88,86 @@ window.ASCENT_CONNECTION = {
   // ---------- Perform: 60 seconds, a target enactment ----------
   perform: {
     prep_seconds: 10, speak_seconds: 60,
-    intro: "A situation and a target move. Ten seconds to think, sixty to say it as you would say it to them. Graded on four things: your stance, the direction you moved them, the lever, and the hand-off. A few targets are Harmful on purpose: perform them so you know what they sound like coming out of you.",
+    intro: "A situation and a target move. Three ways in: choose the line, type it, or say it. Choosing teaches the shape; typing and speaking are graded on four things: your stance, the direction you moved them, the lever, and the hand-off. A few targets are Harmful on purpose: perform them so you know what they sound like coming out of you.",
+    modes: [["mc", "Choose the line"], ["type", "Type it"], ["speak", "Say it"]],
     dims: ["Stance", "Direction", "Lever", "Hand-off"],
+    /* mc options: tag right = the enactment, subtle, with lever and hand-off · blunt = right direction, no subtlety, no lever · wrongdir = moves them the wrong way · wrongstance = speaks from the wrong position. */
+    mcTags: { right: [3, "The move, with the lever and the hand-off said aloud."], blunt: [1, "Right direction, no subtlety: nothing is handed over and no lever carries it, so it lands as a verdict."], wrongdir: [0, "Wrong direction: this moves them the opposite way from the target."], wrongstance: [0, "Wrong stance: this speaks from a position you do not hold in this situation."] },
     items: [
-      { id: "p1", target: 1, t: "Your report missed the deadline a second time and looks defeated. Teach them the method, then hand them the next one to own." },
-      { id: "p2", target: 4, t: "In front of the team, a new hire has out-done you at the thing they were hired for. Endorse them publicly and hand over the decision." },
-      { id: "p3", target: 13, t: "Your co-founder is good at customer calls and does not believe it. Name the strength, set a stretch, and name the day it becomes theirs." },
-      { id: "p4", target: 17, t: "Your co-founder's forecast says 3x next year. Lower it with data and a shared experiment, not with your opinion." },
-      { id: "p5", target: 25, t: "Your lead investor just stated a market number you know is wrong. Correct the fact while holding their standing." },
-      { id: "p6", target: 6, t: "Someone moved customer data to a personal account. Let the rule speak, cleanly, and finish." },
-      { id: "p7", target: 10, t: "A peer on the team is down after a lost deal. Set one small winnable thing this week with a shared metric." },
-      { id: "p8", target: 22, t: "The team is flat after losing the big account and you are the scrappy one. Tell the story of where this goes and build the room for them to lead." },
-      { id: "p9", target: 8, t: "Your best engineer wants to rewrite the whole platform. Deflate it gently with a trial and a number." },
-      { id: "p10", target: 11, t: "A friend-founder is struggling and asks what you think. Ask permission before advice and celebrate the part they already own." },
-      { id: "p11", target: 27, harmful: true, replace: 16, t: "A rival founder just raised a round three times yours. Perform the status attack from below, on purpose, so you hear it. Then you will perform the replacement." },
-      { id: "p12", target: 9, harmful: true, replace: 8, t: "Your most confident engineer is confidently wrong in front of everyone. Perform the Confidence Crusher, on purpose. Then the replacement." },
-      { id: "p13", target: 12, harmful: true, replace: 10, t: "Your co-founder is drowning and you only ever sympathise. Perform the Passive Bystander, on purpose. Then the replacement." },
-      { id: "p14", target: 3, harmful: true, replace: 1, t: "A year in, every decision still comes to you. Perform the Static Commander in a one-to-one, on purpose. Then the replacement." }
+      { id: "p1", target: 1, t: "Your report missed the deadline a second time and looks defeated. Teach them the method, then hand them the next one to own.", mc: [
+        ["right", "Here is how I break one of these down: three steps, written Monday. Let's do this one together now, and the next one is yours. I won't look at it until Friday."],
+        ["blunt", "You need to get more organised. Here's a method; use it next time."],
+        ["wrongdir", "Twice now. I'll take this one back; send me what you have and I'll finish it."],
+        ["wrongstance", "I've missed plenty of deadlines too, honestly. We'll figure it out somehow."]] },
+      { id: "p2", target: 4, t: "In front of the team, a new hire has out-done you at the thing they were hired for. Endorse them publicly and hand over the decision.", mc: [
+        ["right", "Priya's analysis is better than mine was, and that is why she is here. From today pricing decisions are hers. Priya, what do you need from us?"],
+        ["blunt", "Priya did a good job on this. Well done."],
+        ["wrongdir", "Priya has made a start here; I'll take it from this point and get it over the line."],
+        ["wrongstance", "I guess Priya knows more about this than I do. I don't really know what I'm doing on pricing any more."]] },
+      { id: "p3", target: 13, t: "Your co-founder is good at customer calls and does not believe it. Name the strength, set a stretch, and name the day it becomes theirs.", mc: [
+        ["right", "You closed the last three on calls I would have lost. Take the Acme call solo next week, and from the first of the month the customer side is yours. I'll tell the team."],
+        ["blunt", "You're good at calls. Do more of them."],
+        ["wrongdir", "You're fine on calls, but let's keep me on the big ones for now. It's safer."],
+        ["wrongstance", "As your CEO, I'm assigning you customer calls going forward. Report back weekly."]] },
+      { id: "p4", target: 17, t: "Your co-founder's forecast says 3x next year. Lower it with data and a shared experiment, not with your opinion.", mc: [
+        ["right", "If 3x is right, we'd see fifty new logos a month by January. Let's write that down and look together on the first. If it's there, I'm wrong."],
+        ["blunt", "3x isn't realistic. Cut it in half."],
+        ["wrongdir", "3x! Love it. Let's put it in the deck."],
+        ["wrongstance", "I'm not sure I'm qualified to question your numbers. You know the market better than me."]] },
+      { id: "p5", target: 25, t: "Your lead investor just stated a market number you know is wrong. Correct the fact while holding their standing.", mc: [
+        ["right", "Can I check one number with you? Our panel data puts that segment at 40 million, not 400. I'd like to understand where the gap is."],
+        ["blunt", "That number's wrong. It's 40 million."],
+        ["wrongdir", "Right, 400 million, exactly, that's what we've been saying."],
+        ["wrongstance", "Let me walk you through how this market actually works, because that figure is a common mistake."]] },
+      { id: "p6", target: 6, t: "Someone moved customer data to a personal account. Let the rule speak, cleanly, and finish.", mc: [
+        ["right", "That breaks the data rule we all signed, me included. It gets undone today, and here is what happens next. Then it's finished."],
+        ["blunt", "You can't do that. Don't do it again."],
+        ["wrongdir", "I get why you did it, it's faster. Just be careful."],
+        ["wrongstance", "I'm really uncomfortable with this, and I'm not sure what we're supposed to do about it."]] },
+      { id: "p7", target: 10, t: "A peer on the team is down after a lost deal. Set one small winnable thing this week with a shared metric.", mc: [
+        ["right", "Rough one. Let's pick one account we can move by Friday, and we'll both look at the pipeline number together on Friday at four."],
+        ["blunt", "Shake it off. Go win the next one."],
+        ["wrongdir", "Yeah, that one was always going to be hard for you. Maybe leave the enterprise deals to Sam."],
+        ["wrongstance", "As the founder I'm telling you: this is not acceptable. Fix the pipeline."]] },
+      { id: "p8", target: 22, t: "The team is flat after losing the big account and you are the scrappy one. Tell the story of where this goes and build the room for them to lead.", mc: [
+        ["right", "We lost the account we built the year around. Here is where this goes next, and the first step is this. Who wants to run it? I'll clear the room for whoever does."],
+        ["blunt", "We'll bounce back. Everyone back to work."],
+        ["wrongdir", "Honestly, it's brutal out there right now. I don't know what we do."],
+        ["wrongstance", "I've decided the new direction. Here are your assignments."]] },
+      { id: "p9", target: 8, t: "Your best engineer wants to rewrite the whole platform. Deflate it gently with a trial and a number.", mc: [
+        ["right", "Could be right. Rewrite the billing service only, two weeks, and we measure p95 before and after. If it's better, you've earned the next one."],
+        ["blunt", "No. We're not rewriting the platform."],
+        ["wrongdir", "Yes! Let's do the whole thing. How long do you need?"],
+        ["wrongstance", "You're the expert here, I'll stay out of it. Do what you think is right."]] },
+      { id: "p10", target: 11, t: "A friend-founder is struggling and asks what you think. Ask permission before advice and celebrate the part they already own.", mc: [
+        ["right", "Do you want my read, or do you want me to shut up and listen while you work it out? Either way, the part you've already fixed is the hard part."],
+        ["blunt", "Here's what I'd do. First, cut burn."],
+        ["wrongdir", "Honestly, we're both screwed in this market. There's not much anyone can do."],
+        ["wrongstance", "Look, I've been through this more times than you. Let me tell you exactly how it goes."]] },
+      { id: "p11", target: 27, harmful: true, replace: 16, t: "A rival founder just raised a round three times yours. Perform the status attack from below, on purpose, so you hear it. Then you will perform the replacement.", mc: [
+        ["right", "Huge round. Must be nice to have that cap table. Anyway, the product's nothing special."],
+        ["blunt", "Congrats. Big round."],
+        ["wrongdir", "Congrats. How did the process go, and what surprised you? Anything that looks like overreach from where you sit?"],
+        ["wrongstance", "As someone who's raised more than you, let me tell you the mistakes you're about to make."]],
+        mcNote: "Here the target is the Harmful move itself: pick the one that is unmistakably the Envious Diminisher." },
+      { id: "p12", target: 9, harmful: true, replace: 8, t: "Your most confident engineer is confidently wrong in front of everyone. Perform the Confidence Crusher, on purpose. Then the replacement.", mc: [
+        ["right", "Everyone, this is what happens when confidence outruns competence. Sit down."],
+        ["blunt", "That's wrong."],
+        ["wrongdir", "Interesting. Let's test it on one service for two weeks and look at the number together."],
+        ["wrongstance", "I mean, you probably know better than me, so, okay."]],
+        mcNote: "Here the target is the Harmful move itself: pick the one that is unmistakably the Confidence Crusher." },
+      { id: "p13", target: 12, harmful: true, replace: 10, t: "Your co-founder is drowning and you only ever sympathise. Perform the Passive Bystander, on purpose. Then the replacement.", mc: [
+        ["right", "That sounds so hard. I'm here for you. It'll be okay, it always is."],
+        ["blunt", "Yeah. Tough."],
+        ["wrongdir", "It is hard. Let's pick one thing we can move by Friday and look at it together at four."],
+        ["wrongstance", "You need to pull yourself together. The company can't carry you."]],
+        mcNote: "Here the target is the Harmful move itself: pick the one that is unmistakably the Passive Bystander." },
+      { id: "p14", target: 3, harmful: true, replace: 1, t: "A year in, every decision still comes to you. Perform the Static Commander in a one-to-one, on purpose. Then the replacement.", mc: [
+        ["right", "Send me the draft before it goes anywhere. Actually, send me everything before it goes anywhere. I'll handle the client side."],
+        ["blunt", "Check with me first."],
+        ["wrongdir", "Here is how I'd approach it. The next one is yours, and I won't review it until Friday."],
+        ["wrongstance", "I don't know, you decide, I'm too tired to think about it."]],
+        mcNote: "Here the target is the Harmful move itself: pick the one that is unmistakably the Static Commander." }
     ]
   },
   // ---------- Read: name what someone else is doing ----------

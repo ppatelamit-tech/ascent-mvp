@@ -241,3 +241,5 @@ details.more > summary::-webkit-details-marker { display: none; }
 details.more[open] > summary { color: var(--t-faint); }
 .more-body { margin-top: 6px; }
 .more-body .help { margin-top: 6px; font-size: 0.9rem; }
+html.night .chip { background: var(--panel); color: var(--t-body); border-color: #343955; }
+html.night .chip[aria-checked="true"] { background: #232842; color: var(--t-strong); border-color: var(--accent); }
