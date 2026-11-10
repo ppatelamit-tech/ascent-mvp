@@ -1,4 +1,4 @@
-# Ascent — MVP
+# Status 27 — mental fitness app (pilot)
 
 Mental fitness for founders, designed by a psychiatrist. Working name. Pilot build.
 
@@ -38,7 +38,7 @@ The app is fully usable with no account: everything lives in the browser. Accoun
 
 Setup, once:
 
-1. Create a Supabase project. In **Authentication → Providers → Email**, leave Email on and enable magic links (default). Add the site URL (`https://ascent-mvp.netlify.app/app/`) under **Authentication → URL configuration → Redirect URLs**.
+1. Create a Supabase project. In **Authentication → Providers → Email**, leave Email on and enable magic links (default). Add the site URL (`https://status27.netlify.app/app/`) under **Authentication → URL configuration → Redirect URLs**.
 2. In the SQL editor, run:
 
 ```sql
