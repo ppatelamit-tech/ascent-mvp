@@ -63,7 +63,7 @@ label.lbl { display: block; font-size: 0.82rem; font-weight: 600; color: var(--t
 .actions { display: flex; flex-direction: column; gap: 6px; margin-top: 22px; }
 .actions.row { flex-direction: row; }
 .actions.row .btn { flex: 1; }
-.btn { display: flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 20px; border-radius: 999px; border: 1.5px solid var(--hairline); background: #fff; color: var(--t-strong); font-weight: 600; font-size: 1rem; cursor: pointer; text-decoration: none; }
+.btn { display: flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 20px; border-radius: 999px; border: 1.5px solid var(--t-faint); background: var(--panel); color: var(--t-strong); font-weight: 600; font-size: 1rem; cursor: pointer; text-decoration: none; }
 .btn-primary { background: var(--t-strong); color: #fff; border-color: var(--t-strong); }
 .btn-primary:hover { background: #2F3754; }
 .btn[disabled] { opacity: 0.45; cursor: not-allowed; }
@@ -217,3 +217,4 @@ html.night-grey { filter: grayscale(1) brightness(0.9); }
 .setup-steps li { margin-bottom: 12px; }
 .setup-steps li.done strong { color: var(--t-faint); }
 .setup-steps li.now strong { color: var(--em); }
+.btn:not(.btn-primary):not(.btn-link):hover { background: var(--ok-bg); }
