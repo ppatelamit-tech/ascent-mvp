@@ -19,11 +19,10 @@
     function weekKey(ts) { const d = new Date(ts || Date.now()); const day = (d.getDay() + 6) % 7; d.setDate(d.getDate() - day); return dayKey(d); }
     function devDone(day) {
       const s = S();
-      if (s.profile.doneAt && dayKey(s.profile.doneAt) === day) return "Profile";
+      // Setup (Profile, the build) is not training: it never closes the Development pillar.
       if ((s.capability.completions || []).some(k => dayKey(k.at) === day)) return "Capability";
       if ((s.communication.sets || []).some(k => dayKey(k.at) === day)) return "Communication";
       if (((s.enjoyment || {}).sessions || []).some(k => dayKey(k.at) === day)) return "Enjoyment";
-      if (s.intake && s.intake.doneAt && dayKey(s.intake.doneAt) === day) return "Your build";
       for (const [key, name] of [["drive", "Drive"], ["connection", "Connection"], ["vision", "Vision"], ["detachment", "Detachment"]]) if (((s[key] || {}).log || []).some(k => dayKey(k.at) === day)) return name;
       return null;
     }
