@@ -81,7 +81,7 @@
       const ol = h("ol", { class: "steps setup-steps" });
       [["The Profile", "Twelve minutes. Where the seven capacities stand today.", s.profile.done], ["Your build", "Twelve minutes, in as many sittings as you like. Lives to choose between; a character to play.", !!s.character], ["Three things a day: exercise, diet, recovery", "Picked for you. Skip any. Seven closed days in your first ten makes you a founding member.", false]].forEach(([n, l, done], i) => ol.append(h("li", { class: done ? "done" : i + 1 === step ? "now" : "" }, h("strong", {}, n), done ? " ✓" : "", h("div", { class: "fine", style: { marginTop: "2px" } }, l))));
       el.append(ol, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: step === 1 ? "#/profile" : "#/intake" }, step === 1 ? "Begin · the Profile" : "Next · your build")));
-      el.append(h("p", { class: "fine" }, "Training, not treatment. Nothing you answer leaves this device unless you ", h("a", { href: "#/account" }, "sign in"), " to keep it across devices."));
+      el.append(window.ASCENT_MORE("Training, not treatment", h("p", { class: "help" }, "This is a training programme, not medical care. It does not diagnose or treat, and using it makes you nobody's patient. Nothing you answer leaves this device unless you ", h("a", { href: "#/account" }, "sign in"), " to keep it across devices.")));
       return el;
     }
 
@@ -158,7 +158,7 @@
       function showCrisis() { const ov = h("div", { class: "overlay", role: "dialog", "aria-modal": "true" }); ov.append(h("div", { class: "crisis-card" }, h("h2", {}, P.crisis.title), h("p", {}, P.crisis.body), h("div", { class: "crisis-lines" }, h("a", { href: "tel:988" }, "Call or text 988"), h("span", {}, "Text HOME to 741741 · Emergency: 911")), h("button", { class: "btn btn-primary", onclick: () => ov.remove() }, "I've read this"))); document.body.append(ov); }
       if (!dayState.picks && closed) {}
       drawChat(); drawPicks(); drawInput();
-      if (!p.won) el.append(h("p", { class: "fine" }, `Close ${t.GOAL} of your first ${t.WINDOW} days and you are a founding member. Closing a day means all three, honestly. Nobody checks but you.`));
+      if (!p.won) el.append(window.ASCENT_MORE("How the first ten days work", h("p", { class: "help" }, `Close ${t.GOAL} of your first ${t.WINDOW} days and you are a founding member. Closing a day means exercise, diet and recovery, honestly. Nobody checks but you.`)));
       window.addEventListener("hashchange", () => { stopSpeech(); if (rec_) { try { rec_.stop(); } catch {} } }, { once: true });
       return el;
     });

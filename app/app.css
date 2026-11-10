@@ -235,3 +235,9 @@ html.night .bubble.guide { border-color: #343955; box-shadow: none; }
 .listen { flex: none; width: 34px; height: 34px; border-radius: 17px; border: 1.5px solid #C9CFDC; background: var(--canvas); color: var(--t-body); font-size: 0.75rem; cursor: pointer; margin-top: 2px; }
 .listen.playing { background: var(--em); color: #fff; border-color: var(--em); }
 html.night .listen { border-color: #343955; background: #141726; }
+details.more { margin-top: 12px; }
+details.more > summary { list-style: none; cursor: pointer; font-size: 0.85rem; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+details.more > summary::-webkit-details-marker { display: none; }
+details.more[open] > summary { color: var(--t-faint); }
+.more-body { margin-top: 6px; }
+.more-body .help { margin-top: 6px; font-size: 0.9rem; }

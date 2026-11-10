@@ -12,6 +12,8 @@
   function fresh() { return { v: 1, started: Date.now(), profile: { answers: {}, pos: -1, safety: null, done: false, scores: null, refer: false }, capability: { blockStart: null, completions: [], readiness: [] }, communication: { sets: [] }, testMode: location.search.includes("test") }; }
   function load() { try { const s = localStorage.getItem(KEY); return s ? JSON.parse(s) : null; } catch { return null; } }
   function save(quiet) { st.updated = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(st)); } catch {} if (!quiet) try { window.dispatchEvent(new CustomEvent("ascent:save")); } catch {} }
+  // Collapsed fine print: a link-styled summary that opens into the text. Keeps screens uncrowded.
+  window.ASCENT_MORE = function (label, ...content) { const d = h("details", { class: "more" }); d.append(h("summary", {}, label), h("div", { class: "more-body" }, ...content)); return d; };
   function replaceState(obj) { st = obj; save(true); render(); }
   let st = load() || fresh();
   // Select, then Next. A tap marks the choice and reveals one Next button; nothing advances until Next is tapped.
