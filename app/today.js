@@ -40,11 +40,13 @@
     function seeded(str) { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return () => { x ^= x << 13; x ^= x >>> 17; x ^= x << 5; return ((x >>> 0) % 100000) / 100000; }; }
     function pickDevelopment() {
       const s = S(); const live = D.filter(d => d.status === "live");
-      if (!s.profile.done) return { d: null, title: "Take the Profile", line: "Twelve minutes, once. It tells the app where to start you, and it counts as today's Development.", href: "#/profile" };
-      const sc = s.profile.scores || {}; const sorted = live.slice().sort((a, b) => (sc[a.id] || 0) - (sc[b.id] || 0));
-      const weakest = sorted[0]; const others = sorted.slice(1);
+      if (!s.character) return { d: null, title: "Build your character", line: "Six minutes for the core. Lives to choose between; a class at the end.", href: "#/intake" };
+      const sc = s.profile.scores || {}; const placed = live.filter(x => sc[x.id] != null); const unplaced = live.filter(x => sc[x.id] == null);
       const idx = program().idx; const rnd = seeded("dev" + dayKey());
-      const d = idx % 3 === 1 ? weakest : others[Math.floor(rnd() * others.length)] || weakest;
+      let d; if (unplaced.length) d = unplaced[0]; else { const sorted = placed.slice().sort((a, b) => sc[a.id] - sc[b.id]); const weakest = sorted[0]; const others = sorted.slice(1); d = idx % 3 === 1 ? weakest : others[Math.floor(rnd() * others.length)] || weakest; }
+      const out = pickFor(d, s, idx); if (sc[d.id] == null) { out.href = window.ASCENT_PLACE_HREF(d.id, out.href); out.line = "First time here: six placement questions, then the exercise. " + out.line; } return out;
+    }
+    function pickFor(d, s, idx) { const rnd = seeded("devpick" + dayKey());
       const hour = new Date().getHours(), weekend = [0, 6].includes(new Date().getDay());
       if (d.id === "capability") return { d, title: "Today's three", line: "One Warm, one Load, one Edge from your priority areas. The Warm alone closes the day; the Edge is where the confidence comes from.", href: "#/capability" };
       if (d.id === "communication") return { d, title: "One thirty-second set", line: "A topic, ten seconds to think, thirty to speak. Graded on six dimensions. One set closes the day.", href: "#/communication/set" };
@@ -93,7 +95,7 @@
       el.append(tile("Recovery", "liminal rituals", !!rec, "#/recovery",
         h("div", { class: "p-body" }, h("div", {}, h("div", { class: "p-title" }, rec ? `Crossed · ${ritualName(rec.id)}` : "A ritual for what happened"), h("div", { class: "p-line" }, rec ? "Bounded, finished, back in the room." : quiet)))));
       if (!p.won) el.append(h("p", { class: "fine" }, `Close ${GOAL} of your first ${WINDOW} days and you are a founding member. Closing a day means all three, honestly. Nobody checks but you.`));
-      el.append(h("div", { class: "actions row", style: { marginTop: "14px" } }, h("a", { class: "btn btn-link", href: "#/" }, "Back to the Guide"), h("a", { class: "btn btn-link", href: "#/seven" }, "The seven"), h("a", { class: "btn btn-link", href: "#/profile/report" }, "Profile")));
+      el.append(h("div", { class: "actions row", style: { marginTop: "14px" } }, h("a", { class: "btn btn-link", href: "#/" }, "Back to the Guide"), h("a", { class: "btn btn-link", href: "#/seven" }, "The seven"), h("a", { class: "btn btn-link", href: "#/sheet" }, "Your build")));
       return el;
     });
     function ritualName(id) { const r = R.rituals.find(x => x.id === id) || T().rituals.find(x => x.id === id); return r ? r.name : "ritual"; }

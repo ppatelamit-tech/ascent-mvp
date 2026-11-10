@@ -3,6 +3,7 @@
    rev: true = item describes the trained capacity (higher = stronger); default items describe the block (higher = weaker).
    Scoring: each domain 0–100 where 100 = fully trained. Never shown as a diagnosis; bands are capacity words. */
 window.ASCENT_PROFILE = {
+  placement: { eyebrow: "Placement", title: "Six questions to find your *starting level*", body: "The first time you train a capacity, six quick questions set where you start, the way a trainer finds your working weight. Honest beats flattering: a level set too high makes the exercises miss.", done: "Placed. The exercises start from here, and the level moves as you train." },
   scale: ["Never", "Rarely", "Sometimes", "Often", "Almost always"],
   // Items that describe a state rather than a frequency use the agreement set (same 0–4 scoring).
   scaleAgree: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],

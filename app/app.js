@@ -63,21 +63,20 @@
     const pr = st.profile;
     if (pr.done && pr.scores) {
       const weakest = D.slice().sort((a, b) => pr.scores[a.id] - pr.scores[b.id])[0];
-      el.append(h("p", { class: "eyebrow" }, "Development · like working out"), h("h1", {}, em("Your *seven*")), h("p", { class: "help" }, `Profile taken ${fmtDate(pr.doneAt)}. Weakest capacity: ${weakest.name}. Start there, or start at the bottom of the stack.`));
+      el.append(h("p", { class: "eyebrow" }, "Development · like working out"), h("h1", {}, em("Your *seven*")), h("p", { class: "help" }, `All seven placed. Weakest capacity: ${weakest.name}. Start there, or start at the bottom of the stack.`));
     } else {
-      el.append(h("p", { class: "eyebrow" }, "Development · like working out"), h("h1", {}, em("Train the mind that *carries the company*")), h("p", { class: "help" }, "Seven capacities, each the working opposite of a block that stalls founders. Take the Profile first; it tells you where to start."));
-      el.append(h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: "#/profile" }, pr.pos >= 0 ? "Continue the Profile" : "Take the Profile · 12 minutes")));
+      el.append(h("p", { class: "eyebrow" }, "Development · like working out"), h("h1", {}, em("Train the mind that *carries the company*")), h("p", { class: "help" }, "Seven capacities, each the working opposite of a block that stalls founders. The first time you train one, six questions set your starting level."));
     }
     const ul = h("ul", { class: "domains" });
     D.forEach(d => {
       const sc = pr.scores ? pr.scores[d.id] : null;
       const live = d.status === "live";
-      ul.append(h("li", {}, h("a", { class: "domain-card" + (live ? "" : " soon"), href: live ? `#/${d.id}` : `#/domain/${d.id}` },
-        mark(d), h("div", {}, h("div", { class: "name" }, d.name, h("span", { style: { color: "var(--t-faint)", fontWeight: 400 } }, ` · over ${d.block.toLowerCase()}`)), h("div", { class: "sub" }, sc != null ? `${band(sc).name} · ${sc}` : d.line)),
+      ul.append(h("li", {}, h("a", { class: "domain-card" + (live ? "" : " soon"), href: live ? window.ASCENT_PLACE_HREF(d.id, `#/${d.id}`) : `#/domain/${d.id}` },
+        mark(d), h("div", {}, h("div", { class: "name" }, d.name, h("span", { style: { color: "var(--t-faint)", fontWeight: 400 } }, ` · over ${d.block.toLowerCase()}`)), h("div", { class: "sub" }, sc != null ? `${band(sc).name} · ${sc}` : d.line + " · not placed")),
         h("span", { class: "tag" + (live ? " live" : "") }, live ? "Train" : "Soon"))));
     });
     el.append(ul);
-    if (pr.done) el.append(h("div", { class: "actions" }, h("a", { class: "btn", href: "#/profile/report" }, "See your Profile")));
+    if (st.character) el.append(h("div", { class: "actions" }, h("a", { class: "btn", href: "#/sheet" }, "Your build")));
     el.append(h("p", { class: "fine" }, window.ASCENT_CONFIG.brand.app + " is training, not treatment. It does not diagnose, and using it does not make you anyone's patient. If you are struggling, a clinician is the right next step, and the Profile will say so when the numbers say so."));
     return el;
   });
@@ -102,8 +101,29 @@
   }
   const order = []; D.forEach(d => P.items.filter(i => i.d === d.id).forEach((it, k) => order.push({ key: d.id + ":" + k, d: d.id, it, first: k === 0 })));
 
+  // ---------- placement: six questions at the door of each domain ----------
+  window.ASCENT_PLACED = id => !!(st.profile.scores && st.profile.scores[id] != null);
+  window.ASCENT_PLACE_HREF = (id, href) => window.ASCENT_PLACED(id) ? href : `#/place/${id}?next=${encodeURIComponent(href)}`;
+  route(/^place\/(\w+)(?:\?next=(.*))?$/, (id, next) => {
+    const d = byId[id]; if (!d) { nav("/"); return screen(""); } const pr = st.profile; const dest = next ? decodeURIComponent(next).replace(/^#/, "") : "/" + id;
+    if (window.ASCENT_PLACED(id)) { nav(dest); return screen(""); }
+    const items = order.filter(o => o.d === id); let i = items.findIndex(o => pr.answers[o.key] === undefined); let started = i > 0;
+    const el = screen(""); const box = h("div", {}); el.append(box);
+    function finish() { const sc = scoreProfile(); pr.scores = pr.scores || {}; pr.scores[id] = sc[id]; pr.placed = pr.placed || {}; pr.placed[id] = Date.now(); if (D.every(x => pr.scores[x.id] != null)) { pr.done = true; pr.doneAt = pr.doneAt || Date.now(); } save();
+      box.innerHTML = ""; const b = band(pr.scores[id]); box.append(topline(100, d.name, () => nav("/")), h("div", { class: "hub-head" }, mark(d, true), h("div", {}, h("p", { class: "eyebrow", style: { marginTop: 0 } }, `${d.name} · placed`), h("h1", { style: { marginTop: "4px" } }, b.name))), h("p", { class: "help" }, b.note), h("p", { class: "fine" }, P.placement.done), h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => nav(dest) }, "To the exercise"))); }
+    function draw() {
+      box.innerHTML = "";
+      if (i < 0 || i >= items.length) { finish(); return; }
+      if (!started) { box.append(topline(0, d.name, () => nav("/")), h("div", { class: "hub-head" }, mark(d, true), h("div", {}, h("p", { class: "eyebrow", style: { marginTop: 0 } }, `${P.placement.eyebrow} · ${d.name}`), h("h1", { style: { marginTop: "4px" } }, em(P.placement.title)))), h("p", { class: "help" }, P.placement.body), h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => { started = true; draw(); } }, "Begin · one minute"))); return; }
+      const o = items[i]; const agree = o.it.scale === "agree"; const scale = agree ? P.scaleAgree : P.scale;
+      box.append(topline(Math.round(i / items.length * 100), `${d.name} · ${i + 1} of ${items.length}`, () => nav("/")), h("p", { class: "prefix" }, agree ? P.prefixes.agree : P.prefixes.freq), h("p", { class: "statement" }, o.it.t));
+      const opts = h("div", { class: "options", role: "radiogroup" }); scale.forEach((sv, k) => opts.append(h("button", { class: "opt", role: "radio", "aria-checked": "false", onclick: ev => window.ASCENT_SETTLE(ev, () => { pr.answers[o.key] = k; save(); i++; draw(); }) }, h("span", { class: "dot" }), sv))); box.append(opts);
+    }
+    draw(); return el;
+  });
   route(/^profile$/, () => {
     const pr = st.profile;
+    if (!window.ASCENT_FULL_PROFILE) { nav(st.character ? "/sheet" : "/intake"); return screen(""); }
     if (pr.done) { nav("/profile/report"); return screen(""); }
     if (pr.pos < 0) {
       const el = screen("", topline(0, "Profile", () => nav("/")));
@@ -143,6 +163,7 @@
     document.body.append(ov);
   }
   route(/^profile\/report$/, () => {
+    if (!st.profile.scores || !D.every(x => st.profile.scores[x.id] != null)) { nav(st.character ? "/sheet" : "/"); return screen(""); }
     const pr = st.profile; if (!pr.done) { nav("/profile"); return screen(""); }
     const el = screen("", topline(100, "Your Profile", () => nav("/")));
     const sorted = D.slice().sort((a, b) => pr.scores[a.id] - pr.scores[b.id]);

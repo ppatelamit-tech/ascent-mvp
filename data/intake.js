@@ -4,8 +4,8 @@
    F interoception (after MAIA-2), G chronotype (after rMEQ), H context. Styles (Explorer/Builder/Director/Negotiator) are derived, never asked.
    Design doc: "Ascent Profile v2 — character system design" (Status 27). Draft items for Dr. Patel to edit. */
 window.ASCENT_INTAKE = {
-  minutes: 12, // about 92 items; resumable
-  intro: "Twelve minutes, once. Lives to choose between, a few plain questions, no right answers. At the end you get a character: not who you are, the build you are running. It changes when the numbers change.",
+  minutes: 12, coreMinutes: 6, // 92 items: a required core of 47 (class, fear, hunger), then 45 that forge the weapon and stats, resumable
+  intro: "Six minutes now, six more whenever you like. Lives to choose between and a few plain questions, no right answers. The first half gives you a class; the second forges your weapon and stats. Not who you are: the build you are running.",
   likert: [["1", "Very false for me"], ["2", "Somewhat false"], ["3", "Somewhat true"], ["4", "Very true for me"]],
   items: [
     // ---- A. BIS/BAS ----
@@ -111,8 +111,7 @@ window.ASCENT_INTAKE = {
     { id: "H3", block: "H", scale: "ctx", t: "Team size", opts: [["1", "Just me"], ["2-5", "2 to 5"], ["6-20", "6 to 20"], ["21+", "More than 20"]] },
     { id: "H4", block: "H", scale: "ctx", t: "Hours in a typical week", opts: [["<40", "Under 40"], ["40-55", "40 to 55"], ["55-70", "55 to 70"], ["70+", "Over 70"]] }
   ],
-  // presentation order: two vignettes first, then blocks interleaved, context last
-  order: ["V1", "V2", "A1", "B1", "C1", "D1", "E1", "F1", "A2", "B2", "C2", "V3", "A3", "B3", "C3", "D2", "A4", "B4", "C4", "E2", "A5", "B5", "C5", "V4", "A6", "B6", "C6", "F2", "A7", "B7", "C7", "D3", "A8", "B8", "C8", "V5", "A9", "B9", "C9", "E3", "A10", "B10", "C10", "F3", "A11", "B11", "C11", "D4", "A12", "B12", "C12", "V6", "A13", "B13", "C13", "R1", "A14", "B14", "C14", "E4", "A15", "B15", "C15", "F4", "A16", "D5", "V7", "A17", "D6", "A18", "E5", "F5", "V8", "A19", "D7", "A20", "E6", "F6", "V9", "D8", "F7", "R4", "V10", "G1", "G2", "G3", "G4", "G5", "H1", "H2", "H3", "H4"],
+  // presentation order is computed at the foot of this file: the core (vignettes, fear/hunger, need pairs, risk) first, then the rest.
   needs: { certainty: "Certainty", uncertainty: "Uncertainty", significance: "Significance", love: "Love", growth: "Growth", contribution: "Contribution" },
   classes: {
     certainty: { name: "Knight", cost: "Holds the line past the point of sense, and calls it duty.", home: ["detachment", "capability"] },
@@ -175,3 +174,10 @@ window.ASCENT_INTAKE = {
     master: "Same build, higher level. The work is meeting the need you have in a way that stops costing you."
   }
 };
+(function (I) {
+  const ids = b => I.items.filter(i => i.block === b).map(i => i.id);
+  const weave = (...ls) => { const o = []; for (let k = 0; ls.some(l => k < l.length); k++) ls.forEach(l => { if (k < l.length) o.push(l[k]); }); return o; };
+  const core = weave(ids("V"), ids("A"), ids("C"), ids("R"));
+  const rest = weave(ids("B"), ids("D"), ids("E"), ids("F")).concat(ids("G"), ids("H"));
+  I.order = core.concat(rest); I.coreCount = core.length;
+})(window.ASCENT_INTAKE);

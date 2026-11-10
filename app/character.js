@@ -41,7 +41,7 @@
       const senses = g("sense") < 45 ? "dim" : g("sense") < 65 ? "fair" : "keen";
       const hour = sc.meq >= 18 ? "morning" : sc.meq <= 11 ? "evening" : "day";
       const stats = { O: g("O"), C: g("C"), E: g("E"), A: g("A"), S: 100 - g("N") };
-      const flaw = profileScores ? D.slice().sort((a, b) => profileScores[a.id] - profileScores[b.id])[0].id : null;
+      const flaw = profileScores && D.every(d => profileScores[d.id] != null) ? D.slice().sort((a, b) => profileScores[a.id] - profileScores[b.id])[0].id : null;
       return { need, latentNeed, style, latentStyle, title: I.epithets[need][style], fear, hunger, stats, stance, horizon, senses, hour, flaw, raw: { scores: sc, styles }, at: Date.now() };
     }
     function headToHead(sc, a, b) { const it = I.items.find(x => x.pair && x.pair.some(p => p[0] === a) && x.pair.some(p => p[0] === b)); if (!it) return 0; const w = sc.pairWins[it.id]; return w === a ? -1 : w === b ? 1 : 0; }
@@ -54,23 +54,24 @@
     // ---------- intake ----------
     route(/^intake$/, () => {
       const s = S(); s.intake = s.intake || { answers: {}, pos: 0, startedAt: null, doneAt: null };
-      const st = s.intake; const total = I.order.length;
-      if (st.doneAt && s.character && !s.intake.retaking) { nav("/sheet"); return screen(""); }
+      const st = s.intake; const total = I.order.length; const nextPos = () => I.order.findIndex(id => !(id in st.answers)); st.pos = nextPos() < 0 ? total : nextPos();
+      if (st.doneAt && s.character && !s.character.partial && !s.intake.retaking) { nav("/sheet"); return screen(""); }
       const el = screen(""); const box = h("div", {}); el.append(box);
       function draw() {
         box.innerHTML = "";
-        if (st.pos === 0 && !st.startedAt) { box.append(topline(0, "Your build", () => nav("/")), h("p", { class: "eyebrow" }, `${I.minutes} minutes · once · stop and resume any time`), h("h1", {}, em("Lives to *choose between*")), h("p", { class: "help" }, I.intro), h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => { st.startedAt = Date.now(); save(); draw(); } }, "Begin"))); return; }
-        if (st.pos >= total) { finish(); return; }
-        const it = item(I.order[st.pos]); const pct = Math.round(st.pos / total * 100);
-        box.append(topline(pct, `${st.pos + 1} of ${total}`, () => { save(); nav("/"); }));
-        const pick = v => { st.answers[it.id] = v; st.pos++; save(); draw(); };
+        if (st.pos === 0 && !st.startedAt) { box.append(topline(0, "Your build", () => nav("/")), h("p", { class: "eyebrow" }, `${I.coreMinutes} minutes now · the rest whenever`), h("h1", {}, em("Lives to *choose between*")), h("p", { class: "help" }, I.intro), h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => { st.startedAt = Date.now(); save(); draw(); } }, "Begin"))); return; }
+        if (st.pos >= total) { finish(false); return; }
+        if (st.pos >= I.coreCount && !st.coreAt) { st.coreAt = Date.now(); finish(true); return; }
+        const it = item(I.order[st.pos]); const inCore = st.pos < I.coreCount; const segStart = inCore ? 0 : I.coreCount, segLen = inCore ? I.coreCount : total - I.coreCount; const pct = Math.round((st.pos - segStart) / segLen * 100);
+        box.append(topline(pct, `${st.pos - segStart + 1} of ${segLen}`, () => { save(); nav("/"); }));
+        const pick = v => { st.answers[it.id] = v; const np = nextPos(); st.pos = np < 0 ? total : np; save(); draw(); };
         const quit = h("div", { class: "actions row", style: { marginTop: "6px", justifyContent: "flex-end" } }, h("button", { class: "btn btn-link", onclick: () => { save(); nav("/"); } }, "Save and finish later"));
         setTimeout(() => box.append(quit), 0);
         if (it.pair) { box.append(h("p", { class: "eyebrow" }, "Which is more like you, most of the time?")); const opts = h("div", { class: "options", role: "radiogroup" }); const pr = Math.random() < 0.5 ? it.pair : it.pair.slice().reverse(); pr.forEach(([tag, t]) => opts.append(h("button", { class: "opt", role: "radio", "aria-checked": "false", onclick: ev => window.ASCENT_SETTLE(ev, () => pick(tag)) }, h("span", { class: "dot" }), t))); box.append(opts); return; }
         if (it.opts) { box.append(h("p", { class: "eyebrow" }, it.block === "V" ? "Choose a life" : it.block === "R" ? "Your call" : it.block === "H" ? "About the company" : "About your day"), h("p", { class: "statement" }, it.t)); const opts = h("div", { class: "options", role: "radiogroup" }); it.opts.forEach(([v, t]) => opts.append(h("button", { class: "opt", role: "radio", "aria-checked": "false", onclick: ev => window.ASCENT_SETTLE(ev, () => pick(v)) }, h("span", { class: "dot" }), t))); box.append(opts); return; }
         box.append(h("p", { class: "eyebrow" }, "How true is this of you?"), h("p", { class: "statement" }, it.t)); const opts = h("div", { class: "options", role: "radiogroup" }); I.likert.forEach(([v, t]) => opts.append(h("button", { class: "opt", role: "radio", "aria-checked": "false", onclick: ev => window.ASCENT_SETTLE(ev, () => pick(Number(v))) }, h("span", { class: "dot" }), t))); box.append(opts);
       }
-      function finish() { const sc = score(st.answers); const ch = derive(sc, s.profile.scores); s.characterHistory = s.characterHistory || []; if (s.character) s.characterHistory.push(s.character); if (s.character && s.character.path) ch.path = s.character.path; s.character = ch; st.doneAt = Date.now(); st.retaking = false; save(); nav("/sheet"); }
+      function finish(partial) { const sc = score(st.answers); const ch = derive(sc, s.profile.scores); ch.partial = !!partial; if (partial) ch.title = "The " + I.classes[ch.need].name; s.characterHistory = s.characterHistory || []; if (s.character && !s.character.partial) s.characterHistory.push(s.character); if (s.character && s.character.path) ch.path = s.character.path; s.character = ch; if (!partial) { st.doneAt = Date.now(); st.retaking = false; } save(); nav("/sheet"); }
       draw(); return el;
     });
 
@@ -78,28 +79,30 @@
     route(/^sheet$/, () => {
       const s = S(); const ch = s.character; if (!ch) { nav("/intake"); return screen(""); }
       const t = window.ASCENT_TODAY; const p = t.program(); const el = screen("", topline(0, "Your build", () => nav("/")));
-      const cls = I.classes[ch.need], wpn = I.styles[ch.style]; const flawD = ch.flaw ? byId[ch.flaw] : (s.profile.scores ? byId[D.slice().sort((a, b) => s.profile.scores[a.id] - s.profile.scores[b.id])[0].id] : null);
-      el.append(h("div", { class: "sheet-head" }, flawD ? h("div", { class: "sheet-mark" }, mark(flawD, true)) : null, h("div", {}, h("p", { class: "eyebrow" }, `${cls.name} · ${wpn.name.toLowerCase()} · level ${p.closed}`), h("h1", { style: { marginTop: "2px" } }, ch.title), h("p", { class: "help", style: { marginTop: "6px" } }, `${wpn.move} ${cls.cost}`))));
+      const cls = I.classes[ch.need], wpn = I.styles[ch.style]; const sc7 = s.profile.scores || {}; const placedN = D.filter(d => sc7[d.id] != null).length; const allPlaced = placedN === D.length; const flawD = allPlaced ? byId[D.slice().sort((a, b) => sc7[a.id] - sc7[b.id])[0].id] : null; const answered = Object.keys((s.intake || {}).answers || {}).length;
+      el.append(h("div", { class: "sheet-head" }, flawD ? h("div", { class: "sheet-mark" }, mark(flawD, true)) : null, h("div", {}, h("p", { class: "eyebrow" }, ch.partial ? `${cls.name} · weapon not yet forged · level ${p.closed}` : `${cls.name} · ${wpn.name.toLowerCase()} · level ${p.closed}`), h("h1", { style: { marginTop: "2px" } }, ch.title), h("p", { class: "help", style: { marginTop: "6px" } }, ch.partial ? cls.cost : `${wpn.move} ${cls.cost}`))));
       const bar = (label, v, color, word) => h("div", { class: "brow", style: { gridTemplateColumns: "1fr auto" } }, h("div", {}, h("div", { class: "lbl2" }, h("span", {}, label), h("span", {}, word || "")), h("div", { class: "track" }, h("div", { style: { width: v + "%", background: color || "var(--em)" } }))), h("div", { class: "band" }, ""));
       const X = I.explain; const note = t => h("p", { class: "fine", style: { marginTop: "6px" } }, t);
       el.append(h("h2", {}, "Fear and hunger"), h("div", { class: "bars" }, bar("Fear", ch.fear, "var(--crisis)", band(ch.fear)), bar("Hunger", ch.hunger, "#BF7440", band(ch.hunger))), window.ASCENT_MORE("What this means", note(`Fear ${band(ch.fear).toLowerCase()}: ${X.fear[band(ch.fear)]}`), note(`Hunger ${band(ch.hunger).toLowerCase()}: ${X.hunger[band(ch.hunger)]}`)));
+      if (ch.partial) el.append(h("div", { class: "callout accent" }, h("h3", {}, "Forge the weapon"), `${answered} of ${I.order.length} answered. The second half sets your weapon, your five stats, and how you move. About six minutes, in as many sittings as you like.`, h("div", { class: "actions row" }, h("a", { class: "btn btn-primary", href: "#/intake" }, "Continue the build"))));
+      else {
       el.append(h("h2", {}, "Stats"), h("div", { class: "bars" }, ...I.stats.map(([k, name]) => bar(name, ch.stats[k], "var(--accent)", band(ch.stats[k])))), window.ASCENT_MORE("What the stats mean", ...I.stats.map(([k]) => note(X.stats[k]))));
       el.append(h("h2", {}, "How you move"));
       [["Stance", I.words.stance[ch.stance], X.stance[ch.stance]], ["Horizon", I.words.horizon[ch.horizon], X.horizon[ch.horizon]], ["Senses", I.words.senses[ch.senses], X.senses[ch.senses]], ["Hour", I.words.hour[ch.hour], X.hour[ch.hour]]].forEach(([l, w, t]) => el.append(h("div", { class: "callout", style: { marginTop: "10px" } }, h("h3", {}, `${l} · ${w}`), window.ASCENT_MORE("What this means", h("p", { class: "help", style: { marginTop: "4px" } }, t)))));
-      if (s.profile.scores) { el.append(h("h2", {}, "Skills")); const bars = h("div", { class: "bars" }); D.forEach(d => bars.append(h("div", { class: "brow" }, mark(d), h("div", {}, h("div", { class: "lbl2" }, h("span", {}, d.name), h("span", {}, s.profile.scores[d.id])), h("div", { class: "track" }, h("div", { style: { width: s.profile.scores[d.id] + "%", background: d.color } }))), h("div", { class: "band" }, d.id === (flawD || {}).id ? "trains first" : "")))); el.append(bars); }
-      else el.append(h("div", { class: "callout accent" }, h("h3", {}, "Skills"), "The seven skills come from the Profile.", h("div", { class: "actions row" }, h("a", { class: "btn btn-primary", href: "#/profile" }, "Take the Profile"))));
-      el.append(h("div", { class: "callout" }, h("h3", {}, "Off-hand and subclass"), h("span", { class: "greyed" }, `${I.styles[ch.latentStyle].name} · ${I.classes[ch.latentNeed].name}`), " " + I.explain.latent));
+      }
+      el.append(h("h2", {}, "Skills")); { const bars = h("div", { class: "bars" }); D.forEach(d => { const v = sc7[d.id]; bars.append(h("div", { class: "brow" }, mark(d), h("div", {}, h("div", { class: "lbl2" }, h("span", {}, d.name), h("span", {}, v == null ? "" : v)), h("div", { class: "track" }, h("div", { style: { width: (v == null ? 0 : v) + "%", background: d.color } }))), h("div", { class: "band" }, v == null ? "not placed" : flawD && d.id === flawD.id ? "trains first" : ""))); }); el.append(bars); if (!allPlaced) el.append(h("p", { class: "fine" }, `${placedN} of ${D.length} placed. Each skill is placed with six questions the first time you train it.`)); }
+      if (!ch.partial) el.append(h("div", { class: "callout" }, h("h3", {}, "Off-hand and subclass"), h("span", { class: "greyed" }, `${I.styles[ch.latentStyle].name} · ${I.classes[ch.latentNeed].name}`), " " + I.explain.latent));
       if (ch.path) el.append(h("div", { class: "callout accent" }, h("h3", {}, `Road · ${ch.path.kind === "master" ? "Mastery" : ch.path.kind === "weapon" ? "Change the weapon" : "Change the class"}${ch.path.destName ? " · " + ch.path.destName : ""}`), ch.path.gaps.map(g => g.text).join(" "), h("div", { class: "fine", style: { marginTop: "6px" } }, `Since ${fmtDate(ch.path.at)}. Retest moves the sheet; nothing else does.`)));
-      const days = Math.floor((Date.now() - ch.at) / 864e5); const canRetake = days >= RETAKE_DAYS || s.testMode; const canRoads = p.closed >= ROADS_AFTER || s.testMode;
+      const days = Math.floor((Date.now() - ch.at) / 864e5); const canRetake = days >= RETAKE_DAYS || s.testMode; const canRoads = !ch.partial && (p.closed >= ROADS_AFTER || s.testMode);
       const fresh = !s.guide || !Object.keys(s.guide.days || {}).length;
-      el.append(h("div", { class: "spacer" }), h("div", { class: "actions" }, fresh ? h("a", { class: "btn btn-primary", href: "#/" }, "Begin your days") : null, canRoads && !ch.path ? h("a", { class: "btn btn-primary", href: "#/roads" }, "Three roads") : null, h("button", { class: "btn" + (canRetake ? "" : " btn-link"), disabled: !canRetake, onclick: () => { s.intake = { answers: {}, pos: 0, startedAt: null, doneAt: null, retaking: true }; save(); nav("/intake"); } }, canRetake ? "Retake" : `Retake in ${RETAKE_DAYS - days} days`), ch.path ? h("a", { class: "btn btn-link", href: "#/roads" }, "Change road") : null));
+      el.append(h("div", { class: "spacer" }), h("div", { class: "actions" }, fresh ? h("a", { class: "btn btn-primary", href: "#/" }, "Begin your days") : null, canRoads && !ch.path ? h("a", { class: "btn btn-primary", href: "#/roads" }, "Three roads") : null, h("button", { class: "btn" + (canRetake ? "" : " btn-link"), disabled: !canRetake, hidden: !!ch.partial, onclick: () => { s.intake = { answers: {}, pos: 0, startedAt: null, doneAt: null, coreAt: null, retaking: true }; save(); nav("/intake"); } }, canRetake ? "Retake" : `Retake in ${RETAKE_DAYS - days} days`), ch.path ? h("a", { class: "btn btn-link", href: "#/roads" }, "Change road") : null));
       el.append(h("p", { class: "fine" }, canRoads || ch.path ? "A build, not a verdict." : `A build, not a verdict. Roads open after ${ROADS_AFTER} closed days.`));
       return el;
     });
 
     // ---------- roads ----------
     route(/^roads$/, () => {
-      const s = S(); const ch = s.character; if (!ch) { nav("/intake"); return screen(""); }
+      const s = S(); const ch = s.character; if (!ch) { nav("/intake"); return screen(""); } if (ch.partial) { nav("/sheet"); return screen(""); }
       let kind = null, dest = null, proving = null; const el = screen("", topline(0, "Three roads", () => nav("/sheet"))); const box = h("div", {}); el.append(box);
       function say(text) { return h("div", { class: "bubble guide", style: { maxWidth: "100%" } }, text); }
       function s1() { box.innerHTML = ""; box.append(say(I.roads.intro)); const ul = h("ul", { class: "deck" }); [["master", "Master this build", `${ch.title}, higher level.`], ["weapon", "Change the weapon", `${I.styles[ch.style].name} to another. Behaviour; a quarter.`], ["class", "Change the class", `${I.classes[ch.need].name} to another. A different need; months, if at all.`]].forEach(([k, n, l]) => ul.append(h("li", {}, h("button", { class: "card", onclick: () => { kind = k; k === "master" ? s4() : s2(); } }, h("span", { class: "cat" }, n), h("span", {}, l))))); box.append(ul); }
