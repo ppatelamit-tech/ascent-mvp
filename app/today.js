@@ -93,7 +93,7 @@
       const quiet = hour >= 17 ? "Nothing happened? Shut the shop · 2 minutes" : "Something happened? Cross back. Quiet day: shut the shop tonight.";
       el.append(tile("Recovery", "liminal rituals · like recovery", !!rec, "#/recovery",
         h("div", { class: "p-body" }, h("div", {}, h("div", { class: "p-title" }, rec ? `Crossed · ${ritualName(rec.id)}` : "A ritual for what happened"), h("div", { class: "p-line" }, rec ? "Bounded, finished, back in the room." : quiet)))));
-      if (!p.won) el.append(h("p", { class: "fine" }, `Close ${GOAL} of your first ${WINDOW} days and Ascent is free for your first year, with the founder's rate locked after. Closing a day means all three, honestly. Nobody checks but you.`));
+      if (!p.won) el.append(h("p", { class: "fine" }, `Close ${GOAL} of your first ${WINDOW} days and you are a founding member. Closing a day means all three, honestly. Nobody checks but you.`));
       el.append(h("div", { class: "actions row", style: { marginTop: "14px" } }, h("a", { class: "btn btn-link", href: "#/" }, "Back to the Guide"), h("a", { class: "btn btn-link", href: "#/seven" }, "The seven"), h("a", { class: "btn btn-link", href: "#/profile/report" }, "Profile")));
       return el;
     });
