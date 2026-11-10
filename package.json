@@ -2,7 +2,7 @@
   "name": "ascent-mvp",
   "private": true,
   "version": "0.1.0",
-  "description": "Ascent — mental fitness for founders, designed by a psychiatrist. Pilot build.",
+  "description": "Status 27 — durable frameworks for emotional and social IQ training. Mental fitness app, pilot build.",
   "dependencies": {
     "@netlify/blobs": "^8.2.0"
   }

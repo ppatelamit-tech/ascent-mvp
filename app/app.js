@@ -1,4 +1,4 @@
-/* Ascent MVP — single-file app. Vanilla JS, hash router, localStorage. No build step.
+/* Status 27 — app shell. Vanilla JS, hash router, localStorage. No build step.
    Domains: data/domains.js · Profile: data/profile.js · Capability: data/capability.js · Communication: data/communication.js
    Enjoyment: app/enjoyment.js · Drive, Connection, Vision, Detachment: app/development.js · Today/Foundations/Recovery: app/today.js */
 (function () {
@@ -76,7 +76,7 @@
     });
     el.append(ul);
     if (pr.done) el.append(h("div", { class: "actions" }, h("a", { class: "btn", href: "#/profile/report" }, "See your Profile")));
-    el.append(h("p", { class: "fine" }, "Ascent is training, not treatment. It does not diagnose, and using it does not make you anyone's patient. If you are struggling, a clinician is the right next step, and the Profile will say so when the numbers say so."));
+    el.append(h("p", { class: "fine" }, window.ASCENT_CONFIG.brand.app + " is training, not treatment. It does not diagnose, and using it does not make you anyone's patient. If you are struggling, a clinician is the right next step, and the Profile will say so when the numbers say so."));
     return el;
   });
 

@@ -1,4 +1,4 @@
-/* Ascent — offline estimate of the Communication rubric. Used when the grading function is unreachable or unconfigured.
+/* Status 27 — offline estimate of the Communication rubric. Used when the grading function is unreachable or unconfigured.
    Heuristic only; labeled "offline estimate" in the UI. The model grader in netlify/functions/grade.js is the real one. */
 window.ASCENT_LOCAL_GRADE = function (topic, transcript, seconds, firstSentenceAt) {
   const C = window.ASCENT_COMMUNICATION;

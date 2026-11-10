@@ -81,7 +81,7 @@
       const s = S(); const t = T(); const p = program(); const day = dayKey();
       if (p.won && !t.founding) { t.founding = Date.now(); save(); nav("/founding"); return screen(""); }
       const el = screen("home today");
-      el.append(h("div", { class: "wordmark" }, "Ascent", h("small", {}, "designed by a psychiatrist")));
+      el.append(h("div", { class: "wordmark" }, window.ASCENT_CONFIG.brand.app, h("small", {}, window.ASCENT_CONFIG.brand.tag)));
       const dev = devDone(day), fnd = foundDone(day), rec = recDone(day); const closed = dev && fnd && rec;
       el.append(h("h1", {}, closed ? em("Today is *closed*") : em(`Three things, *then done*`)), h("p", { class: "help" }, closed ? "Development, Foundations, Recovery. Nothing else is asked of you today." : "One from each. Train, fuel, recover. The order is yours."));
       el.append(ring(p));
@@ -101,7 +101,7 @@
 
     route(/^founding$/, () => {
       const el = screen("interlude", topline(100, "Founding member", () => nav("/")));
-      el.append(h("p", { class: "eyebrow" }, "Seven of ten"), h("h1", {}, em("You showed up. *The app is yours.*")), h("p", { class: "body" }, "Seven closed days in your first ten. Ascent is free, and you are a founding member: if it ever costs anything, it will not cost you. Nothing to claim; it is already recorded here."), h("p", { class: "body" }, "What happens now is the same thing that happened this week, for longer. The seven get deeper. Foundations gets quieter as it becomes habit. Recovery is there on the days that need it."), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => nav("/") }, "Back to today")));
+      el.append(h("p", { class: "eyebrow" }, "Seven of ten"), h("h1", {}, em("You showed up. *The app is yours.*")), h("p", { class: "body" }, "Seven closed days in your first ten. The app is free, and you are a founding member: if it ever costs anything, it will not cost you. Nothing to claim; it is already recorded here."), h("p", { class: "body" }, "What happens now is the same thing that happened this week, for longer. The seven get deeper. Foundations gets quieter as it becomes habit. Recovery is there on the days that need it."), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => nav("/") }, "Back to today")));
       return el;
     });
 
@@ -161,7 +161,7 @@
     route(/^foundations\/dark$/, () => {
       const t = T(); const el = screen("", topline(0, F.dark.name, () => nav("/foundations")));
       el.append(h("p", { class: "eyebrow" }, "Foundations · the phone"), h("h1", {}, em("Make the phone *boring* after dark")), h("p", { class: "help" }, F.dark.why));
-      el.append(h("h2", {}, "In Ascent"));
+      el.append(h("h2", {}, "In " + window.ASCENT_CONFIG.brand.app));
       const modes = h("div", { class: "chips" });
       [["calm", "Calm dark, after dark"], ["always", "Calm dark, always"], ["grey", "Grey, after dark"], ["off", "Off"]].forEach(([v, l]) => modes.append(h("button", { class: "chip", role: "radio", "aria-checked": String(t.dark.mode === v), onclick: () => { t.dark.mode = v; save(); applyDark(); nav("/foundations/dark"); } }, l)));
       const from = h("select", {}, ...[18, 19, 20, 21, 22].map(x => { const o = h("option", { value: x }, `from ${x}:00`); if (x === t.dark.from) o.selected = true; return o; }));

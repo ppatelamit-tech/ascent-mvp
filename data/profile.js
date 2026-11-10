@@ -1,4 +1,4 @@
-/* Ascent Profile — baseline assessment. In-house draft items for Dr. Patel to correct.
+/* Status 27 Profile — baseline assessment. In-house draft items for Dr. Patel to correct.
    Scale: past month, 0 Never · 1 Rarely · 2 Sometimes · 3 Often · 4 Almost always.
    rev: true = item describes the trained capacity (higher = stronger); default items describe the block (higher = weaker).
    Scoring: each domain 0–100 where 100 = fully trained. Never shown as a diagnosis; bands are capacity words. */
@@ -89,6 +89,6 @@ window.ASCENT_PROFILE = {
   },
   crisis: {
     title: "Thank you for answering that.",
-    body: "Ascent is training, not care, and that answer deserves care. If you are in danger right now, call or text 988 (US) or go to the nearest emergency room. If you are not in danger, please tell someone you trust today and talk to a clinician this week. Your Profile will still be ready, and it will recommend a clinician alongside any training."
+    body: "This is training, not care, and that answer deserves care. If you are in danger right now, call or text 988 (US) or go to the nearest emergency room. If you are not in danger, please tell someone you trust today and talk to a clinician this week. Your Profile will still be ready, and it will recommend a clinician alongside any training."
   }
 };

@@ -1,4 +1,4 @@
-/* Ascent — the seven domains. Order is the curriculum: survival to letting go.
+/* Status 27 — the seven domains. Order is the curriculum: survival to letting go.
    Each domain is the working opposite of a block. Animals are restrained marks:
    illustrated once on the domain screen, used as the progress marker, never animated, never talking. */
 window.ASCENT_DOMAINS = [

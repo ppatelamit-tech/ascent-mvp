@@ -67,8 +67,8 @@
     // ---------- setup: the page before the daily flow exists ----------
     function setup(s, p) {
       const el = screen("home setup"); const step = !s.profile.done ? 1 : 2;
-      el.append(h("div", { class: "wordmark" }, "Ascent", h("small", {}, "designed by a psychiatrist")));
-      el.append(h("p", { class: "eyebrow" }, "Mental fitness for founders"), h("h1", {}, em("Not your brain. *The parts of it that keep letting you down.*")), h("p", { class: "help" }, "Focus is not a muscle; it is what is left when fear, reward and attention are not hijacking it. Ascent trains those parts the way a gym trains legs: three things a day, picked for you, each a few minutes."));
+      el.append(h("div", { class: "wordmark" }, window.ASCENT_CONFIG.brand.app, h("small", {}, window.ASCENT_CONFIG.brand.tag)));
+      el.append(h("p", { class: "eyebrow" }, "Mental fitness for founders"), h("h1", {}, em("Not your brain. *The parts of it that keep letting you down.*")), h("p", { class: "help" }, "Focus is not a muscle; it is what is left when fear, reward and attention are not hijacking it. It trains those parts the way a gym trains legs: three things a day, picked for you, each a few minutes."));
       const ol = h("ol", { class: "steps setup-steps" });
       [["The Profile", "Twelve minutes. Where the seven capacities stand today.", s.profile.done], ["Your build", "Twelve minutes, once. Lives to choose between; a character to play.", !!s.character], ["Three things a day", "Picked for you. Skip any. Seven closed days in your first ten makes you a founding member.", false]].forEach(([n, l, done], i) => ol.append(h("li", { class: done ? "done" : i + 1 === step ? "now" : "" }, h("strong", {}, n), done ? " ✓" : "", h("div", { class: "fine", style: { marginTop: "2px" } }, l))));
       el.append(ol, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: step === 1 ? "#/profile" : "#/intake" }, step === 1 ? "Begin · the Profile" : "Next · your build")));
@@ -84,7 +84,7 @@
       const el = screen("home today guide");
       const menu = h("div", { class: "menu-row" }); menu.hidden = true;
       menu.append(h("button", { class: "btn btn-link", onclick: () => { g.speak = !g.speak; save(); if (!g.speak) try { speechSynthesis.cancel(); } catch {} nav("/"); } }, g.speak ? "Voice off" : "Voice on"), h("a", { class: "btn btn-link", href: "#/today" }, "Browse"), h("a", { class: "btn btn-link", href: s.character ? "#/sheet" : "#/profile/report" }, s.character ? "Your build" : "Profile"), h("a", { class: "btn btn-link", href: "#/account" }, "Account"));
-      el.append(h("div", { class: "wordmark" }, "Ascent", h("button", { class: "more", "aria-label": "More", onclick: () => { menu.hidden = !menu.hidden; } }, "···")), menu);
+      el.append(h("div", { class: "wordmark" }, window.ASCENT_CONFIG.brand.app, h("button", { class: "more", "aria-label": "More", onclick: () => { menu.hidden = !menu.hidden; } }, "···")), menu);
       const dev = t.devDone(day), fnd = t.foundDone(day), rec = t.recDone(day); const closed = dev && fnd && rec;
       const dots = []; for (let i = 0; i < t.GOAL; i++) dots.push(h("span", { class: i < p.closed ? "on" : "" }));
       el.append(h("div", { class: "seven-ring" }, h("div", { class: "dots" }, ...dots), h("div", { class: "r-label" }, p.won ? "Seven days. The app is yours." : p.over ? `${p.closed} of ${t.GOAL} in your ten days` : `Day ${p.idx} of ${t.WINDOW} · ${p.closed} of ${t.GOAL} closed`)));

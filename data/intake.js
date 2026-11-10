@@ -2,7 +2,7 @@
    Blocks: A threat/reward (BIS/BAS, Carver & White 1994, public domain), B Big Five (IPIP-style, three per trait),
    C needs as forced-choice pairs, V vignettes (second asking of the needs), R risk, D regulatory focus, E time orientation,
    F interoception (after MAIA-2), G chronotype (after rMEQ), H context. Styles (Explorer/Builder/Director/Negotiator) are derived, never asked.
-   Design doc: "Ascent Profile v2 — character system design". Draft items for Dr. Patel to edit. */
+   Design doc: "Ascent Profile v2 — character system design" (Status 27). Draft items for Dr. Patel to edit. */
 window.ASCENT_INTAKE = {
   minutes: 12,
   intro: "Twelve minutes, once. Lives to choose between, a few plain questions, no right answers. At the end you get a character: not who you are, the build you are running. It changes when the numbers change.",

@@ -1,4 +1,4 @@
-// Ascent — Communication grader. Netlify function.
+// Status 27 — Communication grader. Netlify function.
 // POST { topic, transcript, seconds, first_sentence_at } → { total, scores:[6], notes:[6], strongest, source:"model" }
 // POST { mode:"connection", scenario, transcript, seconds, target:{n,name,stance,valence,levers,note}, harmful } → { total, scores:[4], notes:[4], source }
 // POST { mode:"counter", thesis } → { counters:[3], base_rate, steelman, test, source }
