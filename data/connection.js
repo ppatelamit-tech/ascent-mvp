@@ -88,11 +88,13 @@ window.ASCENT_CONNECTION = {
   // ---------- Perform: 60 seconds, a target enactment ----------
   perform: {
     prep_seconds: 10, speak_seconds: 60,
-    intro: "A situation and a target move. Three ways in: choose the line, type it, or say it. Choosing teaches the shape; typing and speaking are graded on four things: your stance, the direction you moved them, the lever, and the hand-off. A few targets are Harmful on purpose: perform them so you know what they sound like coming out of you.",
+    intro: "A situation and a target move. Three ways in: choose the line, type it, or say it. Choosing teaches the shape; typing and speaking are graded on four things: your stance, the direction you moved them, the lever, and the hand-off. A few targets are Harmful on purpose, and the aim is to perform them well: as they really sound, plausible and deniable. Only a move you can do well is one you can recognise in the room, or in your own mouth.",
     modes: [["mc", "Choose the line"], ["type", "Type it"], ["speak", "Say it"]],
     dims: ["Stance", "Direction", "Lever", "Hand-off"],
     /* mc options: tag right = the enactment, subtle, with lever and hand-off · blunt = right direction, no subtlety, no lever · wrongdir = moves them the wrong way · wrongstance = speaks from the wrong position. */
     mcTags: { right: [3, "The move, with the lever and the hand-off said aloud."], blunt: [1, "Right direction, no subtlety: nothing is handed over and no lever carries it, so it lands as a verdict."], wrongdir: [0, "Wrong direction: this moves them the opposite way from the target."], wrongstance: [0, "Wrong stance: this speaks from a position you do not hold in this situation."] },
+    // Harmful targets: "right" is the move done skilfully (how it sounds in real life); "blunt" is the cartoon nobody would actually say.
+    mcTagsHarmful: { right: [3, "The move as it really sounds: plausible, deniable, even kind on the surface, and it still does the damage. This is the version to learn to hear."], blunt: [1, "The crude version. Almost nobody says it this way, which is why knowing only this version teaches you to miss the real one."], wrongdir: [0, "Wrong direction: this is the healthy replacement, not the harmful move."], wrongstance: [0, "Wrong stance: this speaks from a position you do not hold in this situation."] },
     items: [
       { id: "p1", target: 1, t: "Your report missed the deadline a second time and looks defeated. Teach them the method, then hand them the next one to own.", mc: [
         ["right", "Here is how I break one of these down: three steps, written Monday. Let's do this one together now, and the next one is yours. I won't look at it until Friday."],
@@ -144,30 +146,30 @@ window.ASCENT_CONNECTION = {
         ["blunt", "Here's what I'd do. First, cut burn."],
         ["wrongdir", "Honestly, we're both screwed in this market. There's not much anyone can do."],
         ["wrongstance", "Look, I've been through this more times than you. Let me tell you exactly how it goes."]] },
-      { id: "p11", target: 27, harmful: true, replace: 16, t: "A rival founder just raised a round three times yours. Perform the status attack from below, on purpose, so you hear it. Then you will perform the replacement.", mc: [
-        ["right", "Huge round. Must be nice to have that cap table. Anyway, the product's nothing special."],
-        ["blunt", "Congrats. Big round."],
+      { id: "p11", target: 27, harmful: true, replace: 16, t: "A rival founder just raised a round three times yours. Perform the status attack from below as it really sounds: sympathetic on the surface, diminishing underneath. Then you will perform the replacement.", mc: [
+        ["right", "Startups are getting crushed these days. You put in all that work to get a tenth of what you should have. We just don't have any leverage anymore."],
+        ["blunt", "Huge round. Must be nice to have that cap table. Anyway, the product's nothing special."],
         ["wrongdir", "Congrats. How did the process go, and what surprised you? Anything that looks like overreach from where you sit?"],
         ["wrongstance", "As someone who's raised more than you, let me tell you the mistakes you're about to make."]],
-        mcNote: "Here the target is the Harmful move itself: pick the one that is unmistakably the Envious Diminisher." },
-      { id: "p12", target: 9, harmful: true, replace: 8, t: "Your most confident engineer is confidently wrong in front of everyone. Perform the Confidence Crusher, on purpose. Then the replacement.", mc: [
-        ["right", "Everyone, this is what happens when confidence outruns competence. Sit down."],
-        ["blunt", "That's wrong."],
+        mcNote: "Here the target is the Harmful move itself, done well. Which line is the Envious Diminisher as it really sounds?" },
+      { id: "p12", target: 9, harmful: true, replace: 8, t: "Your most confident engineer is confidently wrong in front of everyone. Perform the Confidence Crusher as it really sounds: a reasonable request that happens to take them apart in public. Then the replacement.", mc: [
+        ["right", "This is a good learning moment for all of us, so let's slow down. Walk the team through how you got there, step by step. Take your time; we'll wait."],
+        ["blunt", "Everyone, this is what happens when confidence outruns competence. Sit down."],
         ["wrongdir", "Interesting. Let's test it on one service for two weeks and look at the number together."],
         ["wrongstance", "I mean, you probably know better than me, so, okay."]],
-        mcNote: "Here the target is the Harmful move itself: pick the one that is unmistakably the Confidence Crusher." },
-      { id: "p13", target: 12, harmful: true, replace: 10, t: "Your co-founder is drowning and you only ever sympathise. Perform the Passive Bystander, on purpose. Then the replacement.", mc: [
-        ["right", "That sounds so hard. I'm here for you. It'll be okay, it always is."],
-        ["blunt", "Yeah. Tough."],
+        mcNote: "Here the target is the Harmful move itself, done well. Which line is the Confidence Crusher as it really sounds?" },
+      { id: "p13", target: 12, harmful: true, replace: 10, t: "Your co-founder is drowning and you only ever sympathise. Perform the Passive Bystander as it really sounds: generous, understanding, and asking nothing. Then the replacement.", mc: [
+        ["right", "You have so much on your plate, of course things are slipping. Don't put more pressure on yourself this week. Take whatever time you need; nobody is keeping score."],
+        ["blunt", "That sounds so hard. It'll be okay, it always is."],
         ["wrongdir", "It is hard. Let's pick one thing we can move by Friday and look at it together at four."],
         ["wrongstance", "You need to pull yourself together. The company can't carry you."]],
-        mcNote: "Here the target is the Harmful move itself: pick the one that is unmistakably the Passive Bystander." },
-      { id: "p14", target: 3, harmful: true, replace: 1, t: "A year in, every decision still comes to you. Perform the Static Commander in a one-to-one, on purpose. Then the replacement.", mc: [
-        ["right", "Send me the draft before it goes anywhere. Actually, send me everything before it goes anywhere. I'll handle the client side."],
-        ["blunt", "Check with me first."],
+        mcNote: "Here the target is the Harmful move itself, done well. Which line is the Passive Bystander as it really sounds?" },
+      { id: "p14", target: 3, harmful: true, replace: 1, t: "A year in, every decision still comes to you. Perform the Static Commander in a one-to-one as it really sounds: protective, complimentary, and keeping every decision. Then the replacement.", mc: [
+        ["right", "You're doing great, and I don't want you carrying the risk on this one. Run it by me before it goes out, so I can cover you if the client pushes back. I'll take the call myself."],
+        ["blunt", "Send me everything before it goes anywhere. I'll handle the client side."],
         ["wrongdir", "Here is how I'd approach it. The next one is yours, and I won't review it until Friday."],
         ["wrongstance", "I don't know, you decide, I'm too tired to think about it."]],
-        mcNote: "Here the target is the Harmful move itself: pick the one that is unmistakably the Static Commander." }
+        mcNote: "Here the target is the Harmful move itself, done well. Which line is the Static Commander as it really sounds?" }
     ]
   },
   // ---------- Read: name what someone else is doing ----------
