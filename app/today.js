@@ -85,12 +85,12 @@
       el.append(h("h1", {}, closed ? em("Today is *closed*") : em(`Three things, *then done*`)), h("p", { class: "help" }, closed ? "Development, Foundations, Recovery. Nothing else is asked of you today." : "One from each. Train, fuel, recover. The order is yours."));
       el.append(ring(p));
       const pick = pickDevelopment(); const micro = microAction(); const hour = new Date().getHours();
-      el.append(tile("Development", "the seven · like working out", dev, dev ? "#/seven" : pick.href,
+      el.append(tile("Exercise", "the seven · Development", dev, dev ? "#/seven" : pick.href,
         h("div", { class: "p-body" }, pick.d ? mark(pick.d) : null, h("div", {}, h("div", { class: "p-title" }, dev ? `Done · ${dev}` : pick.title), h("div", { class: "p-line" }, dev ? "Browse the seven if you want more; nothing more is required." : pick.line)))));
-      el.append(tile("Foundations", "add and limit · like nutrition", fnd, fnd ? "#/foundations" : "#/foundations/checkin",
+      el.append(tile("Diet", "add and limit · Foundations", fnd, fnd ? "#/foundations" : "#/foundations/checkin",
         h("div", { class: "p-body" }, h("div", {}, h("div", { class: "p-title" }, fnd ? `Checked in · ${micro.kind}: ${micro.name}` : "Thirty-second check-in"), h("div", { class: "p-line" }, fnd ? micro.text : `Sleep, movement, daylight, what you kept out. Then today's ${micro.kind.toLowerCase()}: ${micro.text}`)))));
       const quiet = hour >= 17 ? "Nothing happened? Shut the shop · 2 minutes" : "Something happened? Cross back. Quiet day: shut the shop tonight.";
-      el.append(tile("Recovery", "liminal rituals · like recovery", !!rec, "#/recovery",
+      el.append(tile("Recovery", "liminal rituals", !!rec, "#/recovery",
         h("div", { class: "p-body" }, h("div", {}, h("div", { class: "p-title" }, rec ? `Crossed · ${ritualName(rec.id)}` : "A ritual for what happened"), h("div", { class: "p-line" }, rec ? "Bounded, finished, back in the room." : quiet)))));
       if (!p.won) el.append(h("p", { class: "fine" }, `Close ${GOAL} of your first ${WINDOW} days and you are a founding member. Closing a day means all three, honestly. Nobody checks but you.`));
       el.append(h("div", { class: "actions row", style: { marginTop: "14px" } }, h("a", { class: "btn btn-link", href: "#/" }, "Back to the Guide"), h("a", { class: "btn btn-link", href: "#/seven" }, "The seven"), h("a", { class: "btn btn-link", href: "#/profile/report" }, "Profile")));

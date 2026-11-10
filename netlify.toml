@@ -8,6 +8,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/speak"
+  to = "/.netlify/functions/speak"
+  status = 200
+
+[[redirects]]
   from = "/api/guide"
   to = "/.netlify/functions/guide"
   status = 200

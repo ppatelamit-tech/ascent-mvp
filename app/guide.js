@@ -61,7 +61,17 @@
 
     // ---------- voice ----------
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    function speak(text) { const g = G(); if (!g.speak || !("speechSynthesis" in window)) return; try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); const voices = speechSynthesis.getVoices(); const pref = voices.find(v => /en[-_](GB|US)/.test(v.lang) && /Daniel|Samantha|Google UK English Male|Google US English|Alex|Karen|Moira/.test(v.name)) || voices.find(v => /^en/.test(v.lang)); if (pref) u.voice = pref; u.rate = 0.95; u.pitch = 0.95; speechSynthesis.speak(u); } catch {} }
+    const audioCache = new Map(); let currentAudio = null;
+    function stopSpeech() { try { speechSynthesis.cancel(); } catch {} if (currentAudio) { try { currentAudio.pause(); } catch {} currentAudio = null; } }
+    function speakDevice(text) { try { const u = new SpeechSynthesisUtterance(text); const voices = speechSynthesis.getVoices(); const pref = voices.find(v => /en[-_](GB|US)/.test(v.lang) && /Daniel|Samantha|Google UK English Male|Google US English|Alex|Karen|Moira/.test(v.name)) || voices.find(v => /^en/.test(v.lang)); if (pref) u.voice = pref; u.rate = 0.95; u.pitch = 0.95; speechSynthesis.speak(u); } catch {} }
+    async function speak(text) {
+      const g = G(); if (!g.speak || !text) return; stopSpeech();
+      try {
+        let url = audioCache.get(text);
+        if (!url) { const r = await fetch("/api/speak", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text }) }); if (!r.ok) throw new Error(String(r.status)); const blob = await r.blob(); if (!/audio/.test(blob.type) || blob.size < 1000) throw new Error("no audio"); url = URL.createObjectURL(blob); audioCache.set(text, url); }
+        const a = new Audio(url); currentAudio = a; await a.play();
+      } catch { if ("speechSynthesis" in window) speakDevice(text); }
+    }
 
     // ---------- setup: the page before the daily flow exists ----------
     function setup(s, p) {
@@ -69,7 +79,7 @@
       el.append(h("div", { class: "wordmark" }, window.ASCENT_CONFIG.brand.app, h("small", {}, window.ASCENT_CONFIG.brand.tag)));
       el.append(h("p", { class: "eyebrow" }, "Mental fitness for founders"), h("h1", {}, em("Not your brain. *The parts of it that keep letting you down.*")), h("p", { class: "help" }, "Focus is not a muscle; it is what is left when fear, reward and attention are not hijacking it. It trains those parts the way a gym trains legs: three things a day, picked for you, each a few minutes."));
       const ol = h("ol", { class: "steps setup-steps" });
-      [["The Profile", "Twelve minutes. Where the seven capacities stand today.", s.profile.done], ["Your build", "Twelve minutes, in as many sittings as you like. Lives to choose between; a character to play.", !!s.character], ["Three things a day", "Picked for you. Skip any. Seven closed days in your first ten makes you a founding member.", false]].forEach(([n, l, done], i) => ol.append(h("li", { class: done ? "done" : i + 1 === step ? "now" : "" }, h("strong", {}, n), done ? " ✓" : "", h("div", { class: "fine", style: { marginTop: "2px" } }, l))));
+      [["The Profile", "Twelve minutes. Where the seven capacities stand today.", s.profile.done], ["Your build", "Twelve minutes, in as many sittings as you like. Lives to choose between; a character to play.", !!s.character], ["Three things a day: exercise, diet, recovery", "Picked for you. Skip any. Seven closed days in your first ten makes you a founding member.", false]].forEach(([n, l, done], i) => ol.append(h("li", { class: done ? "done" : i + 1 === step ? "now" : "" }, h("strong", {}, n), done ? " ✓" : "", h("div", { class: "fine", style: { marginTop: "2px" } }, l))));
       el.append(ol, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: step === 1 ? "#/profile" : "#/intake" }, step === 1 ? "Begin · the Profile" : "Next · your build")));
       el.append(h("p", { class: "fine" }, "Training, not treatment. Nothing you answer leaves this device unless you ", h("a", { href: "#/account" }, "sign in"), " to keep it across devices."));
       return el;
@@ -82,7 +92,7 @@
       if (!s.profile.done) return setup(s, p);
       const el = screen("home today guide");
       const menu = h("div", { class: "menu-row" }); menu.hidden = true;
-      menu.append(h("button", { class: "btn btn-link", onclick: () => { g.speak = !g.speak; save(); if (!g.speak) try { speechSynthesis.cancel(); } catch {} nav("/"); } }, g.speak ? "Voice off" : "Voice on"), h("a", { class: "btn btn-link", href: "#/today" }, "Browse"), h("a", { class: "btn btn-link", href: s.character ? "#/sheet" : "#/profile/report" }, s.character ? "Your build" : "Profile"), h("a", { class: "btn btn-link", href: "#/account" }, "Account"));
+      menu.append(h("button", { class: "btn btn-link", onclick: () => { g.speak = !g.speak; save(); if (!g.speak) stopSpeech(); nav("/"); } }, g.speak ? "Voice off" : "Voice on"), h("a", { class: "btn btn-link", href: "#/today" }, "Browse"), h("a", { class: "btn btn-link", href: s.character ? "#/sheet" : "#/profile/report" }, s.character ? "Your build" : "Profile"), h("a", { class: "btn btn-link", href: "#/account" }, "Account"));
       el.append(h("div", { class: "wordmark" }, window.ASCENT_CONFIG.brand.app, h("button", { class: "more", "aria-label": "More", onclick: () => { menu.hidden = !menu.hidden; } }, "···")), menu);
       const dev = t.devDone(day), fnd = t.foundDone(day), rec = t.recDone(day); const closed = dev && fnd && rec;
       const dots = []; for (let i = 0; i < t.GOAL; i++) dots.push(h("span", { class: i < p.closed ? "on" : "" }));
@@ -96,9 +106,9 @@
       function drawChat() { chat.innerHTML = ""; dayState.msgs.forEach(m => chat.append(bubble(m))); if (busy) chat.append(h("div", { class: "bubble guide thinking" }, "…")); }
       function drawPicks() {
         picksBox.innerHTML = "";
-        if (closed) { picksBox.append(h("div", { class: "pillar done" }, h("div", { class: "p-head" }, h("span", { class: "p-label" }, "Today"), h("span", { class: "p-check" }, "✓")), h("div", { class: "p-body" }, h("div", {}, h("div", { class: "p-title" }, "Today is closed"), h("div", { class: "p-line" }, "All three. Nothing else is asked of you."))))); return; }
+        if (closed) { picksBox.append(h("div", { class: "pillar done" }, h("div", { class: "p-head" }, h("span", { class: "p-label" }, "Today"), h("span", { class: "p-check" }, "✓")), h("div", { class: "p-body" }, h("div", {}, h("div", { class: "p-title" }, "Today is closed"), h("div", { class: "p-line" }, "Exercise, diet, recovery. Nothing else is asked of you."))))); return; }
         if (!dayState.picks) return;
-        const order = [["development", "Development", dev], ["foundations", "Foundations", fnd], ["recovery", "Recovery", rec]];
+        const order = [["development", "Exercise", dev], ["foundations", "Diet", fnd], ["recovery", "Recovery", rec]];
         const doneN = order.filter(o => o[2]).length; const next = order.find(o => !o[2]); if (!next) return;
         order.forEach(([k, label, v], i) => { if (!v || order.indexOf(next) < i) return; picksBox.append(h("div", { class: "done-row" }, h("span", { class: "p-label" }, `${i + 1} · ${label}`), h("span", {}, typeof v === "string" ? v : k === "recovery" ? t.ritualName(v.id) : "check-in"), h("span", { class: "p-check" }, "✓"))); });
         const [k, label] = next; const list = (dayState.picks[k] || []).filter(id => !dayState.skipped.includes(id)); const item = list.map(findItem).find(Boolean);
@@ -122,7 +132,7 @@
         rec_.onresult = ev => { let interim = ""; for (let i = ev.resultIndex; i < ev.results.length; i++) { const r = ev.results[i]; if (r.isFinal) finalText += (finalText ? " " : "") + r[0].transcript.trim(); else interim += r[0].transcript; } inp.value = finalText + (interim ? " " + interim : ""); };
         rec_.onerror = ev => { btn.classList.remove("live"); rec_ = null; if (ev.error === "not-allowed") inp.placeholder = "Microphone blocked. Type instead."; };
         rec_.onend = () => { btn.classList.remove("live"); rec_ = null; const v = inp.value.trim(); if (v) { send(v); inp.value = ""; } };
-        try { speechSynthesis.cancel(); } catch {} try { rec_.start(); btn.classList.add("live"); } catch {}
+        stopSpeech(); try { rec_.start(); btn.classList.add("live"); } catch {}
       }
       async function send(text) {
         if (busy) return; dayState.msgs.push({ role: "user", text, at: Date.now() }); save();
@@ -144,7 +154,7 @@
       if (!dayState.picks && closed) {}
       drawChat(); drawPicks(); drawInput();
       if (!p.won) el.append(h("p", { class: "fine" }, `Close ${t.GOAL} of your first ${t.WINDOW} days and you are a founding member. Closing a day means all three, honestly. Nobody checks but you.`));
-      window.addEventListener("hashchange", () => { try { speechSynthesis.cancel(); } catch {} if (rec_) { try { rec_.stop(); } catch {} } }, { once: true });
+      window.addEventListener("hashchange", () => { stopSpeech(); if (rec_) { try { rec_.stop(); } catch {} } }, { once: true });
       return el;
     });
   });
