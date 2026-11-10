@@ -1,6 +1,6 @@
 /* The Guide — chat-first Today. Owns the home route. The tiles live on at #/today ("Browse").
    The Guide asks, briefly, what kind of day it is, then picks one activity per pillar from the catalogue; the person does or skips.
-   Voice in: Web Speech transcription on the device (nothing recorded). Voice out: the device's speech synthesis, optional.
+   Voice in: Web Speech transcription on the device (nothing recorded). Voice out: ElevenLabs via /api/speak on a Listen button per reply, never automatic; device voice as fallback.
    Selection is the model's (netlify/functions/guide.js) with a rule-based fallback; the model never diagnoses, interprets or advises.
    Registers through window.ASCENT_PLUGINS before today.js so its home route wins. */
 (function () {
@@ -64,13 +64,13 @@
     const audioCache = new Map(); let currentAudio = null;
     function stopSpeech() { try { speechSynthesis.cancel(); } catch {} if (currentAudio) { try { currentAudio.pause(); } catch {} currentAudio = null; } }
     function speakDevice(text) { try { const u = new SpeechSynthesisUtterance(text); const voices = speechSynthesis.getVoices(); const pref = voices.find(v => /en[-_](GB|US)/.test(v.lang) && /Daniel|Samantha|Google UK English Male|Google US English|Alex|Karen|Moira/.test(v.name)) || voices.find(v => /^en/.test(v.lang)); if (pref) u.voice = pref; u.rate = 0.95; u.pitch = 0.95; speechSynthesis.speak(u); } catch {} }
-    async function speak(text) {
-      const g = G(); if (!g.speak || !text) return; stopSpeech();
+    async function speak(text, onEnd) {
+      if (!text) return; stopSpeech();
       try {
         let url = audioCache.get(text);
         if (!url) { const r = await fetch("/api/speak", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text }) }); if (!r.ok) throw new Error(String(r.status)); const blob = await r.blob(); if (!/audio/.test(blob.type) || blob.size < 1000) throw new Error("no audio"); url = URL.createObjectURL(blob); audioCache.set(text, url); }
-        const a = new Audio(url); currentAudio = a; await a.play();
-      } catch { if ("speechSynthesis" in window) speakDevice(text); }
+        const a = new Audio(url); currentAudio = a; a.onended = () => { currentAudio = null; onEnd && onEnd(); }; await a.play();
+      } catch { if ("speechSynthesis" in window) { speakDevice(text); setTimeout(() => onEnd && onEnd(), Math.min(20000, text.length * 60)); } else onEnd && onEnd(); }
     }
 
     // ---------- setup: the page before the daily flow exists ----------
@@ -92,7 +92,7 @@
       if (!s.profile.done) return setup(s, p);
       const el = screen("home today guide");
       const menu = h("div", { class: "menu-row" }); menu.hidden = true;
-      menu.append(h("button", { class: "btn btn-link", onclick: () => { g.speak = !g.speak; save(); if (!g.speak) stopSpeech(); nav("/"); } }, g.speak ? "Voice off" : "Voice on"), h("a", { class: "btn btn-link", href: "#/today" }, "Browse"), h("a", { class: "btn btn-link", href: s.character ? "#/sheet" : "#/profile/report" }, s.character ? "Your build" : "Profile"), h("a", { class: "btn btn-link", href: "#/account" }, "Account"));
+      menu.append(h("a", { class: "btn btn-link", href: "#/today" }, "Browse"), h("a", { class: "btn btn-link", href: s.character ? "#/sheet" : "#/profile/report" }, s.character ? "Your build" : "Profile"), h("a", { class: "btn btn-link", href: "#/account" }, "Account"));
       el.append(h("div", { class: "wordmark" }, window.ASCENT_CONFIG.brand.app, h("button", { class: "more", "aria-label": "More", onclick: () => { menu.hidden = !menu.hidden; } }, "···")), menu);
       const dev = t.devDone(day), fnd = t.foundDone(day), rec = t.recDone(day); const closed = dev && fnd && rec;
       const dots = []; for (let i = 0; i < t.GOAL; i++) dots.push(h("span", { class: i < p.closed ? "on" : "" }));
@@ -101,8 +101,13 @@
       if (!s.character) { const n = Object.keys((s.intake || {}).answers || {}).length; el.append(h("a", { class: "pillar resume", href: "#/intake" }, h("div", { class: "p-head" }, h("span", { class: "p-label" }, "Your build"), h("span", { class: "p-sub" }, n ? `${n} of ${window.ASCENT_INTAKE.order.length}` : "not started")), h("div", { class: "p-body" }, h("div", {}, h("div", { class: "p-title" }, n ? "Resume the inventory" : "Build your character"), h("div", { class: "p-line" }, "Twelve minutes in total, in as many sittings as you like. The daily picks sharpen once it is done."))))); }
       el.append(chat, picksBox, inputRow);
       let busy = false, rec_ = null;
-      if (!dayState.msgs.length) { dayState.msgs.push({ role: "guide", text: greeting(), at: Date.now() }); save(); setTimeout(() => speak(dayState.msgs[0].text), 300); }
-      function bubble(m) { return h("div", { class: "bubble " + (m.role === "user" ? "me" : "guide") }, m.text); }
+      if (!dayState.msgs.length) { dayState.msgs.push({ role: "guide", text: greeting(), at: Date.now() }); save(); }
+      function bubble(m) {
+        if (m.role === "user") return h("div", { class: "bubble me" }, m.text);
+        const btn = h("button", { class: "listen", "aria-label": "Listen", title: "Listen" }, "▶");
+        btn.onclick = () => { if (btn.classList.contains("playing")) { stopSpeech(); btn.classList.remove("playing"); btn.textContent = "▶"; return; } document.querySelectorAll(".listen.playing").forEach(b => { b.classList.remove("playing"); b.textContent = "▶"; }); btn.classList.add("playing"); btn.textContent = "■"; speak(m.text, () => { btn.classList.remove("playing"); btn.textContent = "▶"; }); };
+        return h("div", { class: "bubble guide" }, h("span", {}, m.text), btn);
+      }
       function drawChat() { chat.innerHTML = ""; dayState.msgs.forEach(m => chat.append(bubble(m))); if (busy) chat.append(h("div", { class: "bubble guide thinking" }, "…")); }
       function drawPicks() {
         picksBox.innerHTML = "";
@@ -136,7 +141,7 @@
       }
       async function send(text) {
         if (busy) return; dayState.msgs.push({ role: "user", text, at: Date.now() }); save();
-        if (CRISIS.test(text)) { const say = "That is bigger than this app. Please call or text 988 now, or 911 if you are in danger. The Profile will carry a note so a clinician is the next step, not training."; s.profile.refer = true; dayState.msgs.push({ role: "guide", text: say, at: Date.now() }); save(); drawChat(); speak(say); showCrisis(); return; }
+        if (CRISIS.test(text)) { const say = "That is bigger than this app. Please call or text 988 now, or 911 if you are in danger. The Profile will carry a note so a clinician is the next step, not training."; s.profile.refer = true; dayState.msgs.push({ role: "guide", text: say, at: Date.now() }); save(); drawChat(); showCrisis(); return; }
         busy = true; drawChat(); drawInput();
         const userTurns = dayState.msgs.filter(m => m.role === "user").length; const mustPick = dayState.questions >= MAX_Q || userTurns >= MAX_Q + 1 || !!dayState.picks;
         let result;
@@ -145,10 +150,10 @@
         busy = false; applyResult(result);
       }
       function applyResult(result) {
-        if (result.crisis) { s.profile.refer = true; dayState.msgs.push({ role: "guide", text: result.say, at: Date.now() }); save(); drawChat(); drawInput(); speak(result.say); showCrisis(); return; }
+        if (result.crisis) { s.profile.refer = true; dayState.msgs.push({ role: "guide", text: result.say, at: Date.now() }); save(); drawChat(); drawInput(); showCrisis(); return; }
         if (result.question) dayState.questions = (dayState.questions || 0) + 1;
         if (result.picks) { const hasAny = ["development", "foundations", "recovery"].some(k => (result.picks[k] || []).length); if (hasAny) { dayState.picks = result.picks; dayState.why = result.why || null; ["development", "foundations", "recovery"].forEach(k => { if (!(dayState.picks[k] || []).length) dayState.picks[k] = fallbackPicks(dayState.msgs.filter(m => m.role === "user").map(m => m.text).join(" ")).picks[k]; }); } }
-        dayState.msgs.push({ role: "guide", text: result.say, at: Date.now() }); save(); drawChat(); drawPicks(); drawInput(); speak(result.say); picksBox.scrollIntoView && dayState.picks && setTimeout(() => picksBox.scrollIntoView({ behavior: "smooth", block: "nearest" }), 200);
+        dayState.msgs.push({ role: "guide", text: result.say, at: Date.now() }); save(); drawChat(); drawPicks(); drawInput(); picksBox.scrollIntoView && dayState.picks && setTimeout(() => picksBox.scrollIntoView({ behavior: "smooth", block: "nearest" }), 200);
       }
       function showCrisis() { const ov = h("div", { class: "overlay", role: "dialog", "aria-modal": "true" }); ov.append(h("div", { class: "crisis-card" }, h("h2", {}, P.crisis.title), h("p", {}, P.crisis.body), h("div", { class: "crisis-lines" }, h("a", { href: "tel:988" }, "Call or text 988"), h("span", {}, "Text HOME to 741741 · Emergency: 911")), h("button", { class: "btn btn-primary", onclick: () => ov.remove() }, "I've read this"))); document.body.append(ov); }
       if (!dayState.picks && closed) {}
