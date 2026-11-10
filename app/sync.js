@@ -35,7 +35,10 @@
     async function deleteAccount() { if (!sb || !user) return; const { error } = await sb.from(TABLE).delete().eq("user_id", user.id); if (error) throw error; await signOut(); }
 
     if (sb) {
-      const fromLink = /access_token=|error_description=/.test(location.hash);
+      const fromLink = /access_token=|error_description=|refresh_token=/.test(location.hash) || /[?&]code=/.test(location.search);
+      // diagnostic: remember the shape of how a link landed (keys only, never values), so the Account screen can show it
+      if (/access_token|error|code=|type=/.test(location.hash + location.search)) { try { const keys = (location.hash.replace(/^#\/?/, "") + "&" + location.search.replace(/^\?/, "")).split(/[&#]/).map(kv => kv.split("=")[0]).filter(Boolean); localStorage.setItem("ascent-link-debug", JSON.stringify({ at: Date.now(), keys, ua: navigator.userAgent.slice(0, 80), standalone: !!(navigator.standalone || matchMedia("(display-mode: standalone)").matches) })); } catch {} }
+      sb.auth.onAuthStateChange((ev2) => { try { const d = JSON.parse(localStorage.getItem("ascent-link-debug") || "null"); if (d) { d.events = (d.events || []).concat(ev2).slice(-6); localStorage.setItem("ascent-link-debug", JSON.stringify(d)); } } catch {} });
       sb.auth.onAuthStateChange((event, session) => { const was = user; user = session ? session.user : null; if (user && (!was || was.id !== user.id)) pull().then(() => { if (fromLink || location.hash.startsWith("#/account")) { justSignedIn = true; nav("/account"); } }); if (!user) status = "idle"; });
       if (fromLink && /error_description=/.test(location.hash)) setTimeout(() => { linkError = decodeURIComponent((location.hash.match(/error_description=([^&]*)/) || [, "The link did not work."])[1]).replace(/\+/g, " "); nav("/account"); }, 50);
       window.addEventListener("ascent:save", () => { if (!user) return; clearTimeout(pushTimer); pushTimer = setTimeout(push, 1500); });
@@ -47,6 +50,7 @@
       el.append(h("p", { class: "eyebrow" }, "Your data"), h("h1", {}, em("Keep it *across devices*")));
       if (!ready) { el.append(h("p", { class: "help" }, "Accounts are not switched on in this build. Everything you have done lives in this browser only: clear the browser and it is gone, change phones and it does not follow. Nothing has been sent anywhere."), h("p", { class: "fine" }, "To switch them on: fill app/config.js with the Supabase project URL and anon key, and run the SQL in the README.")); return el; }
       if (!user) {
+        try { const d = JSON.parse(localStorage.getItem("ascent-link-debug") || "null"); if (d) el.append(h("p", { class: "fine" }, `Last link landed ${new Date(d.at).toLocaleString()} with: ${d.keys.join(", ") || "nothing"} · events: ${(d.events || []).join(" → ") || "none"} · ${d.standalone ? "installed app" : "browser"} · ${d.ua}`)); } catch {}
         if (linkError) { el.append(h("div", { class: "callout accent" }, h("h3", {}, "That link did not work"), linkError + " Ask for a new one below; links last an hour and work once.")); linkError = null; }
         const inp = h("input", { type: "email", placeholder: "you@company.com", autocomplete: "email", value: pendingEmail || "" }); const note = h("p", { class: "fine" });
         const codeBox = h("div", {}); codeBox.hidden = !pendingEmail;
