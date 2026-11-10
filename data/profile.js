@@ -4,6 +4,9 @@
    Scoring: each domain 0–100 where 100 = fully trained. Never shown as a diagnosis; bands are capacity words. */
 window.ASCENT_PROFILE = {
   scale: ["Never", "Rarely", "Sometimes", "Often", "Almost always"],
+  // Items that describe a state rather than a frequency use the agreement set (same 0–4 scoring).
+  scaleAgree: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
+  prefixes: { freq: "In the past month…", agree: "Right now…" },
   bands: [
     { min: 0,  name: "Early",       note: "This capacity is carrying most of the weight of its block right now." },
     { min: 40, name: "Developing",  note: "Trained in some situations, not yet under load." },
@@ -27,7 +30,7 @@ window.ASCENT_PROFILE = {
     // Capability (Fear)
     { d: "capability", t: "When a real threat to the company appeared, my body reacted as if it were an emergency for hours afterward." },
     { d: "capability", t: "I avoided a conversation, call, or task because of how it would feel, not because it was the wrong move." },
-    { d: "capability", t: "I could read how much runway or risk we actually had, separate from how it felt.", rev: true },
+    { d: "capability", t: "I can read how much runway or risk we actually have, separate from how it feels.", scale: "agree", rev: true },
     { d: "capability", t: "Fear about survival (mine or the company's) shaped a decision more than the facts did." },
     { d: "capability", t: "I did something that scared me because it was the right move, and it went fine.", rev: true },
     { d: "capability", t: "My sleep, eating, or exercise fell apart when pressure went up." },
@@ -41,20 +44,20 @@ window.ASCENT_PROFILE = {
     { d: "enjoyment", t: "I had at least a few hours a week that belonged to pleasure and nothing else.", rev: true },
 
     // Drive (Shame)
-    { d: "drive", t: "I could say what I value in a sentence and name a thing I did this week because of it.", rev: true },
+    { d: "drive", t: "I can say what I value in a sentence and name a thing I did this week because of it.", scale: "agree", rev: true },
     { d: "drive", t: "A goal I was chasing was really about proving something to someone." },
     { d: "drive", t: "I kept working past the point of usefulness because stopping felt like being exposed." },
-    { d: "drive", t: "My motivation survived a bad week because it did not depend on how I looked.", rev: true },
+    { d: "drive", t: "My motivation survives a bad week because it does not depend on how I look.", scale: "agree", rev: true },
     { d: "drive", t: "I compared my progress with other founders and felt smaller for it." },
-    { d: "drive", t: "My daily and weekly targets traced back to something I actually care about, not to what would impress.", rev: true },
+    { d: "drive", t: "My daily and weekly targets trace back to something I actually care about, not to what would impress.", scale: "agree", rev: true },
 
     // Connection (Grief)
     { d: "connection", t: "I could raise someone else's standing in a room without feeling I had lost any of my own.", rev: true },
     { d: "connection", t: "I held onto a position or decision in a conversation mainly to avoid looking lower than the other person." },
     { d: "connection", t: "I repaired a rupture with a co-founder, hire, investor, or partner within a few days.", rev: true },
-    { d: "connection", t: "There is a relationship the company has cost me that I have not let myself feel." },
+    { d: "connection", t: "There is a relationship the company has cost me that I have not let myself feel.", scale: "agree" },
     { d: "connection", t: "I noticed what someone was doing to my status in a conversation while it was happening, not afterward.", rev: true },
-    { d: "connection", t: "I felt alone in a way that no one around me could see." },
+    { d: "connection", t: "I feel alone in a way that no one around me can see.", scale: "agree" },
 
     // Communication (Lies)
     { d: "communication", t: "I gave a board, investor, or team a number or state that was more presentable than true." },
@@ -65,7 +68,7 @@ window.ASCENT_PROFILE = {
     { d: "communication", t: "I said the thing that made me look worst, without qualifying it, because it was true.", rev: true },
 
     // Vision (Illusion)
-    { d: "vision", t: "I could separate what I hoped would happen from what I expected would happen.", rev: true },
+    { d: "vision", t: "I can separate what I hope will happen from what I expect will happen.", scale: "agree", rev: true },
     { d: "vision", t: "I defended the company's story in a conversation instead of attacking it to see if it held." },
     { d: "vision", t: "A forecast I made was wrong in the direction I wanted it to be right." },
     { d: "vision", t: "Before I believed an explanation for why something worked, I asked what the base rate was.", rev: true },
@@ -73,15 +76,17 @@ window.ASCENT_PROFILE = {
     { d: "vision", t: "I talked myself into a reading of the facts that, later, I could see was the one I wanted." },
 
     // Detachment (Attachment)
-    { d: "detachment", t: "If the company failed tomorrow, I would still know who I am.", rev: true },
+    { d: "detachment", t: "If the company failed tomorrow, I would still know who I am.", scale: "agree", rev: true },
     { d: "detachment", t: "I held onto a decision or task that someone else could have owned because I needed to be essential." },
     { d: "detachment", t: "A piece of news about the company changed how I felt about myself as a person." },
     { d: "detachment", t: "I was unreachable for a planned stretch and the company was fine.", rev: true },
-    { d: "detachment", t: "I could imagine handing this company to someone else without it feeling like a death.", rev: true },
+    { d: "detachment", t: "I can imagine handing this company to someone else without it feeling like a death.", scale: "agree", rev: true },
     { d: "detachment", t: "I checked metrics, email, or messages when there was no decision to make." }
   ],
-  /* Safety layer. Never scored, never shown as a score. A yes routes to the crisis card and marks the profile for referral. */
+  /* Safety layer — OFF (Nov 2026): a direct self-harm question in a training app creates a duty the app cannot meet.
+     The 988 strip stays on every screen and the Guide routes crisis language to the crisis card. Set enabled: true to restore. */
   safety: {
+    enabled: false,
     prefix: "One more question, asked of everyone. It is not part of your Profile.",
     text: "In the past two weeks, have you had thoughts that you would be better off dead, or of hurting yourself?",
     options: ["No", "Yes"],

@@ -194,8 +194,8 @@ html.night-grey { filter: grayscale(1) brightness(0.9); }
 /* ---------- the Guide (chat-first home) ---------- */
 .chat { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
 .bubble { max-width: 88%; padding: 11px 14px; border-radius: 18px; line-height: 1.45; font-size: 0.98rem; white-space: pre-wrap; }
-.bubble.guide { align-self: flex-start; background: var(--panel); border: 1.5px solid var(--hairline); border-bottom-left-radius: 6px; color: var(--t-strong); font-family: var(--font-display); font-size: 1.12rem; }
-.bubble.me { align-self: flex-end; background: var(--ok-bg); border: 1.5px solid #D4DCEA; border-bottom-right-radius: 6px; color: var(--t-body); }
+.bubble.guide { align-self: flex-start; background: var(--panel); border: 1.5px solid #C9CFDC; box-shadow: 0 1px 2px rgba(35,42,64,0.06); border-bottom-left-radius: 6px; color: var(--t-strong); font-family: var(--font-display); font-size: 1.12rem; }
+.bubble.me { align-self: flex-end; background: #E4EAF4; border: 1.5px solid #C2CCE0; border-bottom-right-radius: 6px; color: var(--t-body); }
 .bubble.thinking { color: var(--t-faint); letter-spacing: 0.2em; }
 .picks { margin-top: 6px; }
 .pillar.pick { cursor: default; }
@@ -218,3 +218,13 @@ html.night-grey { filter: grayscale(1) brightness(0.9); }
 .setup-steps li.done strong { color: var(--t-faint); }
 .setup-steps li.now strong { color: var(--em); }
 .btn:not(.btn-primary):not(.btn-link):hover { background: var(--ok-bg); }
+html.night .bubble.guide { border-color: #343955; box-shadow: none; }
+.pillar.resume { border-style: dashed; }
+.chip { border-color: #C9CFDC; }
+.beats { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.beat { padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--hairline); background: var(--panel); }
+.beat.now { border-color: var(--em); }
+.beat.past { opacity: 0.6; }
+.beat.next { opacity: 0.45; }
+.beat-name { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.beat-text { font-family: var(--font-display); font-size: 1.2rem; line-height: 1.35; margin-top: 4px; }

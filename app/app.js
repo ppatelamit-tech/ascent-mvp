@@ -108,18 +108,19 @@
       el.append(h("p", { class: "eyebrow" }, "Baseline"), h("h1", {}, em(P.intro.title)), h("p", { class: "help", style: { fontSize: "1.05rem", lineHeight: 1.6 } }, P.intro.body), h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => { pr.pos = 0; pr.startedAt = Date.now(); save(); render(); } }, "Begin")));
       return el;
     }
-    if (pr.pos >= order.length) return safetyScreen();
+    if (pr.pos >= order.length) { if (P.safety && P.safety.enabled) return safetyScreen(); pr.scores = scoreProfile(); pr.done = true; pr.doneAt = Date.now(); save(); nav("/profile/report"); return screen(""); }
     const o = order[pr.pos], d = byId[o.d], i = pr.pos;
-    const pct = Math.round((i / (order.length + 1)) * 100);
+    const pct = Math.round((i / order.length) * 100);
     if (o.first && !pr["seen:" + o.d]) {
       const el = screen("interlude", topline(pct, d.name, back));
       el.append(mark(d, true), h("p", { class: "eyebrow" }, `${d.name} · over ${d.block.toLowerCase()}`), h("h1", {}, d.animal), h("p", { class: "body" }, P.interludes[d.id]), h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => { pr["seen:" + o.d] = true; save(); render(); } }, "Continue")));
       return el;
     }
     const el = screen("", topline(pct, `${d.name} · ${i + 1} of ${order.length}`, back));
-    el.append(h("p", { class: "prefix" }, "In the past month…"), h("p", { class: "statement" }, o.it.t));
+    const agree = o.it.scale === "agree"; const scale = agree ? P.scaleAgree : P.scale;
+    el.append(h("p", { class: "prefix" }, agree ? P.prefixes.agree : P.prefixes.freq), h("p", { class: "statement" }, o.it.t));
     const opts = h("div", { class: "options", role: "radiogroup" });
-    P.scale.forEach((s, k) => opts.append(h("button", { class: "opt", role: "radio", "aria-checked": String(pr.answers[o.key] === k), onclick: ev => window.ASCENT_SETTLE(ev, () => { pr.answers[o.key] = k; pr.pos++; save(); render(); }) }, h("span", { class: "dot" }), s)));
+    scale.forEach((s, k) => opts.append(h("button", { class: "opt", role: "radio", "aria-checked": String(pr.answers[o.key] === k), onclick: ev => window.ASCENT_SETTLE(ev, () => { pr.answers[o.key] = k; pr.pos++; save(); render(); }) }, h("span", { class: "dot" }), s)));
     el.append(opts, h("div", { class: "spacer" }));
     return el;
     function back() { if (pr.pos > 0) { pr.pos--; save(); render(); } else { pr.pos = -1; save(); render(); } }

@@ -15,11 +15,11 @@ window.ASCENT_RECOVERY = {
     { id: "week", name: "Week's end", line: "Review and close. Seven days, three lines." }
   ],
   rituals: [
-    { id: "shut-the-shop", trigger: ["day", "hard"], author: "detachment", name: "Shut the shop", minutes: 2, needs: "Paper and a pen. A drawer.",
+    { id: "shut-the-shop", trigger: ["day", "hard"], author: "detachment", name: "Shut the shop", minutes: 2, needs: "Paper, a pen, and a drawer. The phone stays with you for the timer; it goes down at the end.",
       beats: [
-        { name: "Separation", seconds: 50, text: "Write the day's three unfinished things on paper. Only three. Not the list, the three that will follow you to bed." },
-        { name: "Crossing", seconds: 30, text: "Say, out loud if you can: not tonight. Fold the paper once. Put it in the drawer. The phone goes in with it." },
-        { name: "Return", seconds: 30, text: "Close the drawer. The shop is shut. It opens at eight, and everything in it will still be there. Stand up. Notice the room." }
+        { name: "Separation", seconds: 50, text: "On paper, write the three unfinished things that would follow you to bed tonight. Only three; not the list." },
+        { name: "Crossing", seconds: 30, text: "Say, out loud if you can: not tonight. Fold the paper once and put it in the drawer. Close the drawer." },
+        { name: "Return", seconds: 30, text: "The shop is shut. It opens at eight, and everything in it will still be there. Stand up. Look around the room. When this timer ends, the phone goes face down somewhere that is not your bed." }
       ] },
     { id: "cleansing", trigger: ["fail", "hard"], author: "drive", name: "Cleansing", minutes: 3, needs: "A sink. Cold water.",
       beats: [

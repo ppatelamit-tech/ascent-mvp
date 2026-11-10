@@ -4,7 +4,7 @@
    F interoception (after MAIA-2), G chronotype (after rMEQ), H context. Styles (Explorer/Builder/Director/Negotiator) are derived, never asked.
    Design doc: "Ascent Profile v2 — character system design" (Status 27). Draft items for Dr. Patel to edit. */
 window.ASCENT_INTAKE = {
-  minutes: 12,
+  minutes: 12, // about 92 items; resumable
   intro: "Twelve minutes, once. Lives to choose between, a few plain questions, no right answers. At the end you get a character: not who you are, the build you are running. It changes when the numbers change.",
   likert: [["1", "Very false for me"], ["2", "Somewhat false"], ["3", "Somewhat true"], ["4", "Very true for me"]],
   items: [
@@ -74,8 +74,6 @@ window.ASCENT_INTAKE = {
     { id: "V10", block: "V", t: "Ten years on, the company worked. What would make you say it was worth it?", opts: [["certainty", "It never once nearly died."], ["uncertainty", "It surprised you every year."], ["significance", "Your name is on the thing."], ["love", "The people are still in your life."], ["growth", "You are a different person than when you started."], ["contribution", "Something outside the company is better because of it."]] },
     // ---- R. risk ----
     { id: "R1", block: "R", scale: "risk", t: "Take $100,000 now, or flip a coin for $1,000,000?", opts: [[0, "The $100,000"], [1, "The coin"]] },
-    { id: "R2", block: "R", scale: "risk", t: "Take $100,000 now, or flip a coin for $250,000?", opts: [[0, "The $100,000"], [1, "The coin"]] },
-    { id: "R3", block: "R", scale: "loss", t: "You are handed $10,000. Bet it on a coin flip for $25,000?", opts: [[0, "No"], [1, "Yes"]] },
     { id: "R4", block: "R", scale: "loss", t: "A deal: 90% chance of doubling your company, 10% chance of ending it. Take it?", opts: [[0, "No"], [1, "Yes"]] },
     // ---- D. regulatory focus ----
     { id: "D1", block: "D", scale: "prom", t: "I think more about what I could gain than what I could lose." },
@@ -114,7 +112,7 @@ window.ASCENT_INTAKE = {
     { id: "H4", block: "H", scale: "ctx", t: "Hours in a typical week", opts: [["<40", "Under 40"], ["40-55", "40 to 55"], ["55-70", "55 to 70"], ["70+", "Over 70"]] }
   ],
   // presentation order: two vignettes first, then blocks interleaved, context last
-  order: ["V1", "V2", "A1", "B1", "C1", "D1", "E1", "F1", "A2", "B2", "C2", "V3", "A3", "B3", "C3", "D2", "A4", "B4", "C4", "E2", "A5", "B5", "C5", "V4", "A6", "B6", "C6", "F2", "A7", "B7", "C7", "D3", "A8", "B8", "C8", "V5", "A9", "B9", "C9", "E3", "A10", "B10", "C10", "F3", "A11", "B11", "C11", "D4", "A12", "B12", "C12", "V6", "A13", "B13", "C13", "R1", "A14", "B14", "C14", "E4", "A15", "B15", "C15", "F4", "A16", "D5", "V7", "A17", "D6", "R2", "A18", "E5", "F5", "V8", "A19", "D7", "R3", "A20", "E6", "F6", "V9", "D8", "F7", "R4", "V10", "G1", "G2", "G3", "G4", "G5", "H1", "H2", "H3", "H4"],
+  order: ["V1", "V2", "A1", "B1", "C1", "D1", "E1", "F1", "A2", "B2", "C2", "V3", "A3", "B3", "C3", "D2", "A4", "B4", "C4", "E2", "A5", "B5", "C5", "V4", "A6", "B6", "C6", "F2", "A7", "B7", "C7", "D3", "A8", "B8", "C8", "V5", "A9", "B9", "C9", "E3", "A10", "B10", "C10", "F3", "A11", "B11", "C11", "D4", "A12", "B12", "C12", "V6", "A13", "B13", "C13", "R1", "A14", "B14", "C14", "E4", "A15", "B15", "C15", "F4", "A16", "D5", "V7", "A17", "D6", "A18", "E5", "F5", "V8", "A19", "D7", "A20", "E6", "F6", "V9", "D8", "F7", "R4", "V10", "G1", "G2", "G3", "G4", "G5", "H1", "H2", "H3", "H4"],
   needs: { certainty: "Certainty", uncertainty: "Uncertainty", significance: "Significance", love: "Love", growth: "Growth", contribution: "Contribution" },
   classes: {
     certainty: { name: "Knight", cost: "Holds the line past the point of sense, and calls it duty.", home: ["detachment", "capability"] },
@@ -137,6 +135,16 @@ window.ASCENT_INTAKE = {
     love: { explorer: "The Trickster", builder: "The Innkeeper", director: "The Herald", negotiator: "The Harper" },
     growth: { explorer: "The Alchemist", builder: "The Artificer", director: "The Seer", negotiator: "The Sage" },
     contribution: { explorer: "The Forager", builder: "The Gardener", director: "The Shepherd", negotiator: "The Grovekeeper" }
+  },
+  explain: {
+    fear: { Low: "Threat barely registers until it is close. Good under fire; the risk is not bracing when you should.", Mid: "Threat registers and passes. The ordinary range.", High: "Threat registers early and stays. You see the cliff before anyone; the cost is a body that treats a board meeting like a predator." },
+    hunger: { Low: "Wanting is quiet. You can leave a reward on the table; the risk is leaving the table.", Mid: "Wanting shows up when something is worth it. The ordinary range.", High: "Wanting is loud. You move on opportunity fast and feel every win; the cost is the phone being louder than the plan." },
+    stats: { O: "Curiosity: appetite for new ideas and views that overturn yours.", C: "Order: finishing what you said you would, on the day you said.", E: "Spark: energy from rooms full of people, and starting the conversation.", A: "Warmth: assuming good intent and making time for others.", S: "Steadiness: how long a bad hour stays with you. Higher is steadier." },
+    stance: { vanguard: "You play to win: gains loom larger than losses, and a missed chance stings more than a mistake. Goals should be framed as reaching, and the Vision ledger keeps the reach honest.", steady: "You weigh wins and losses about evenly. Goals can be framed either way.", warden: "You play not to lose: a mistake stays with you longer than a missed chance. Goals should be framed as protecting what matters, and Capability trains the reaching." },
+    horizon: { past: "Your attention lives behind you: what happened explains what is. Useful memory, heavy to carry. Vision and Recovery pull the weight forward.", present: "Your attention lives in the day in front of you. Easy to be with; hard to plan with. Drive's cadence and Vision's check dates give it reach.", future: "Your attention lives ahead: lists, five-year shapes, today traded for later. Powerful and tiring. Enjoyment and the rituals bring you back into the room." },
+    senses: { dim: "You read your body late, or not at all: you learn you were stressed from what you did. Body-first rituals come before verbal ones.", fair: "You read your body when you stop to check. The ordinary range.", keen: "You read your body early and in detail. An early-warning system; the Cleansing and Threshold rituals land fast for you." },
+    hour: { morning: "Your best hours are early. The Guide will put the hard thing before noon.", day: "Your best hours sit in the middle of the day.", evening: "Your best hours come late. The Guide will not ask for the hard thing at eight in the morning." },
+    latent: "Your second class and second weapon, greyed because they are near but untrained. One pick in three draws from them until they take colour. Then the roads open."
   },
   stats: [["O", "Curiosity"], ["C", "Order"], ["E", "Spark"], ["A", "Warmth"], ["S", "Steadiness"]],
   words: { stance: { vanguard: "Vanguard", steady: "Steady", warden: "Rearguard" }, horizon: { past: "Behind", present: "Here", future: "Ahead" }, senses: { keen: "Keen", fair: "Fair", dim: "Dim" }, hour: { morning: "Morning", day: "Day", evening: "Evening" } },

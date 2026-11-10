@@ -19,8 +19,8 @@
     function catalogue() {
       const s = S(); const day = TD().dayKey(); const out = []; const add = (id, pillar, title, minutes, href, suits, d) => out.push({ id, pillar, title, minutes, href, suits, d });
       if (!s.profile.done) add("profile", "development", "Take the Profile (baseline across all seven)", 12, "#/profile", "first day; nothing else counts until this is done", null);
-      else if (!s.character) add("intake", "development", "Build your character (twelve minutes, once)", 12, "#/intake", "second session; lives to choose between; the sheet everything else hangs on", null);
       else {
+        if (!s.character) { const it = s.intake || {}; const n = Object.keys(it.answers || {}).length; add("intake", "development", n ? `Resume your build (${n} of ${window.ASCENT_INTAKE.order.length} answered)` : "Build your character (twelve minutes, stop and resume any time)", Math.max(2, Math.round(12 * (1 - n / window.ASCENT_INTAKE.order.length))), "#/intake", "the sheet everything else hangs on; can be finished over several sittings", null); }
         add("capability", "development", "Today's three challenges (Capability, over fear)", 10, "#/capability", "nervous, avoiding something, procrastinating, small and doable wanted", byId.capability);
         E.adventures.forEach(a => add("enj:" + a.id, "development", `Audio adventure: ${a.title} (${a.grade}, Enjoyment, over guilt)`, a.minutes, `#/enjoyment/play/${a.id}`, a.grade === "calm" ? "tired, wired, late, guilt about resting" : a.grade === "active" ? "flat, needs a lift, mid-day" : "weekend, time to spare, wants to be taken somewhere", byId.enjoyment));
         add("communication", "development", "One thirty-second set (Communication, over lies)", 2, "#/communication/set", "a hard conversation coming, something unsaid, board or co-founder", byId.communication);
@@ -70,7 +70,7 @@
       el.append(h("div", { class: "wordmark" }, window.ASCENT_CONFIG.brand.app, h("small", {}, window.ASCENT_CONFIG.brand.tag)));
       el.append(h("p", { class: "eyebrow" }, "Mental fitness for founders"), h("h1", {}, em("Not your brain. *The parts of it that keep letting you down.*")), h("p", { class: "help" }, "Focus is not a muscle; it is what is left when fear, reward and attention are not hijacking it. It trains those parts the way a gym trains legs: three things a day, picked for you, each a few minutes."));
       const ol = h("ol", { class: "steps setup-steps" });
-      [["The Profile", "Twelve minutes. Where the seven capacities stand today.", s.profile.done], ["Your build", "Twelve minutes, once. Lives to choose between; a character to play.", !!s.character], ["Three things a day", "Picked for you. Skip any. Seven closed days in your first ten makes you a founding member.", false]].forEach(([n, l, done], i) => ol.append(h("li", { class: done ? "done" : i + 1 === step ? "now" : "" }, h("strong", {}, n), done ? " ✓" : "", h("div", { class: "fine", style: { marginTop: "2px" } }, l))));
+      [["The Profile", "Twelve minutes. Where the seven capacities stand today.", s.profile.done], ["Your build", "Twelve minutes, in as many sittings as you like. Lives to choose between; a character to play.", !!s.character], ["Three things a day", "Picked for you. Skip any. Seven closed days in your first ten makes you a founding member.", false]].forEach(([n, l, done], i) => ol.append(h("li", { class: done ? "done" : i + 1 === step ? "now" : "" }, h("strong", {}, n), done ? " ✓" : "", h("div", { class: "fine", style: { marginTop: "2px" } }, l))));
       el.append(ol, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: step === 1 ? "#/profile" : "#/intake" }, step === 1 ? "Begin · the Profile" : "Next · your build")));
       el.append(h("p", { class: "fine" }, "Training, not treatment. Nothing you answer leaves this device unless you ", h("a", { href: "#/account" }, "sign in"), " to keep it across devices."));
       return el;
@@ -80,7 +80,7 @@
     route(/^$/, () => {
       const t = TD(); const s = S(); const day = t.dayKey(); const p = t.program(); const dayState = today(); const g = G();
       if (p.won && !(s.today || {}).founding) { s.today.founding = Date.now(); save(); nav("/founding"); return screen(""); }
-      if (!s.profile.done || !s.character) return setup(s, p);
+      if (!s.profile.done) return setup(s, p);
       const el = screen("home today guide");
       const menu = h("div", { class: "menu-row" }); menu.hidden = true;
       menu.append(h("button", { class: "btn btn-link", onclick: () => { g.speak = !g.speak; save(); if (!g.speak) try { speechSynthesis.cancel(); } catch {} nav("/"); } }, g.speak ? "Voice off" : "Voice on"), h("a", { class: "btn btn-link", href: "#/today" }, "Browse"), h("a", { class: "btn btn-link", href: s.character ? "#/sheet" : "#/profile/report" }, s.character ? "Your build" : "Profile"), h("a", { class: "btn btn-link", href: "#/account" }, "Account"));
@@ -88,7 +88,9 @@
       const dev = t.devDone(day), fnd = t.foundDone(day), rec = t.recDone(day); const closed = dev && fnd && rec;
       const dots = []; for (let i = 0; i < t.GOAL; i++) dots.push(h("span", { class: i < p.closed ? "on" : "" }));
       el.append(h("div", { class: "seven-ring" }, h("div", { class: "dots" }, ...dots), h("div", { class: "r-label" }, p.won ? "Seven days. The app is yours." : p.over ? `${p.closed} of ${t.GOAL} in your ten days` : `Day ${p.idx} of ${t.WINDOW} · ${p.closed} of ${t.GOAL} closed`)));
-      const chat = h("div", { class: "chat" }); const picksBox = h("div", { class: "picks" }); const inputRow = h("div", { class: "chat-input" }); el.append(chat, picksBox, inputRow);
+      const chat = h("div", { class: "chat" }); const picksBox = h("div", { class: "picks" }); const inputRow = h("div", { class: "chat-input" });
+      if (!s.character) { const n = Object.keys((s.intake || {}).answers || {}).length; el.append(h("a", { class: "pillar resume", href: "#/intake" }, h("div", { class: "p-head" }, h("span", { class: "p-label" }, "Your build"), h("span", { class: "p-sub" }, n ? `${n} of ${window.ASCENT_INTAKE.order.length}` : "not started")), h("div", { class: "p-body" }, h("div", {}, h("div", { class: "p-title" }, n ? "Resume the inventory" : "Build your character"), h("div", { class: "p-line" }, "Twelve minutes in total, in as many sittings as you like. The daily picks sharpen once it is done."))))); }
+      el.append(chat, picksBox, inputRow);
       let busy = false, rec_ = null;
       if (!dayState.msgs.length) { dayState.msgs.push({ role: "guide", text: greeting(), at: Date.now() }); save(); setTimeout(() => speak(dayState.msgs[0].text), 300); }
       function bubble(m) { return h("div", { class: "bubble " + (m.role === "user" ? "me" : "guide") }, m.text); }

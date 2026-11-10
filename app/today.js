@@ -231,10 +231,16 @@
         box.innerHTML = "";
         if (beat < 0) { box.append(h("h1", {}, em(`*${r.name}*`)), h("p", { class: "help" }, `Three beats, about ${r.minutes} minutes. ${r.needs}`), h("p", { class: "help" }, "Separation: name what ended. Crossing: the thing you do. Return: step back into the room. Each beat has a floor; you cannot rush it, and you can take longer."), r.source ? h("p", { class: "source" }, r.source) : null, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => { beat = 0; startBeat(); } }, "Begin"))); return; }
         if (beat >= r.beats.length) { box.append(h("p", { class: "eyebrow" }, "Return complete"), h("h1", {}, em("You are *back in the room*")), h("p", { class: "help" }, "That is the ritual. Nothing more to do with it tonight."), h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", onclick: () => { t.ritualLog.unshift({ id: r.id, trigger: trig || r.trigger[0], at: Date.now() }); save(); nav("/"); } }, "Crossed · back to today"))); return; }
-        const b = r.beats[beat]; const pct = Math.round(100 * (1 - left / b.seconds));
-        box.append(h("p", { class: "eyebrow" }, `${beat + 1} of 3 · ${b.name}`), h("p", { class: "statement" }, b.text), h("div", { class: "timer" }, h("div", { class: "ring", style: { "--pct": pct + "%" } }, h("div", { class: "t" }, left > 0 ? String(left) : "·"))), h("div", { class: "spacer" }), h("div", { class: "actions" }, h("button", { class: "btn btn-primary", disabled: left > 0, onclick: () => { beat++; startBeat(); } }, left > 0 ? "Stay with it" : beat === r.beats.length - 1 ? "Step back in" : "Next beat")));
+        const b = r.beats[beat];
+        box.append(h("p", { class: "eyebrow" }, `${beat + 1} of 3 · ${b.name}`));
+        const list = h("div", { class: "beats" });
+        r.beats.forEach((bb, i) => list.append(h("div", { class: "beat" + (i < beat ? " past" : i === beat ? " now" : " next") }, h("div", { class: "beat-name" }, bb.name), i <= beat ? h("div", { class: "beat-text" }, bb.text) : h("div", { class: "beat-text fine" }, "…"))));
+        const ring = h("div", { class: "ring", style: { "--pct": Math.round(100 * (1 - left / b.seconds)) + "%" } }, h("div", { class: "t" }, left > 0 ? String(left) : "·"));
+        const btn = h("button", { class: "btn btn-primary", disabled: left > 0, onclick: () => { beat++; startBeat(); } }, left > 0 ? "Stay with it" : beat === r.beats.length - 1 ? "Step back in" : "Next beat");
+        box.append(list, h("div", { class: "timer" }, ring), h("div", { class: "spacer" }), h("div", { class: "actions" }, btn));
+        box._tick = () => { ring.style.setProperty("--pct", Math.round(100 * (1 - left / b.seconds)) + "%"); ring.querySelector(".t").textContent = left > 0 ? String(left) : "·"; btn.disabled = left > 0; btn.textContent = left > 0 ? "Stay with it" : beat === r.beats.length - 1 ? "Step back in" : "Next beat"; };
       }
-      function startBeat() { stop(); if (beat >= r.beats.length) { draw(); return; } left = r.beats[beat].seconds; draw(); timer = setInterval(() => { left--; if (left <= 0) { left = 0; stop(); } draw(); }, 1000); }
+      function startBeat() { stop(); if (beat >= r.beats.length) { draw(); return; } left = r.beats[beat].seconds; draw(); timer = setInterval(() => { left--; if (left <= 0) { left = 0; stop(); } if (box._tick) box._tick(); }, 1000); }
       window.addEventListener("hashchange", stop, { once: true });
       draw(); return el;
     });
