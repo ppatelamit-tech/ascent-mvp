@@ -84,7 +84,7 @@
       const ol = h("ol", { class: "steps setup-steps" });
       [["Your build", `Who is training. About ${I.coreMinutes} minutes: lives to choose between, and a class at the end.`, false, true], ["Three things a day: exercise, diet, recovery", "Picked for you. Skip any. The first time you meet each exercise, six questions set your starting level.", false, false]].forEach(([t1, l, done, now]) => ol.append(h("li", { class: now ? "now" : "" }, h("strong", {}, t1), h("div", { class: "fine", style: { marginTop: "2px" } }, l))));
       el.append(ol, h("div", { class: "spacer" }), h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: "#/intake" }, n ? `Continue your build · ${n} of ${I.coreCount}` : "Begin · your build")));
-      el.append(window.ASCENT_MORE("Training, not treatment", h("p", { class: "help" }, "This is a training programme, not medical care. It does not diagnose or treat, and using it makes you nobody's patient. Nothing you answer leaves this device unless you ", h("a", { href: "#/account" }, "sign in"), " to keep it across devices.")));
+      el.append(window.ASCENT_MORE("Training, not treatment", h("p", { class: "help" }, "This is a training program, not medical care. It does not diagnose or treat, and using it makes you nobody's patient. Nothing you answer leaves this device unless you ", h("a", { href: "#/account" }, "sign in"), " to keep it across devices.")));
       return el;
     }
 
